@@ -1,0 +1,418 @@
+// SPINVERSE - Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+//
+// Phase 1 only configures the PostgreSQL connection. Data models are added in
+// later phases; after adding a model run `npm run prisma:migrate:dev`.
+//
+// The connection string is read from DATABASE_URL (see `.env`).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 2 - Authentication & Authorization
+// -----------------------------------------------------------------------------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique // always stored lower-cased
+  passwordHash String // bcrypt hash - the plain-text password is never stored
+  role         Role     @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  demoWallet    DemoWallet?
+  walletTransactions WalletTransaction[]
+  auditLogs          AuditLog[]
+  gameSessions  GameSession[]
+
+  @@map("users")
+}
+
+/// One row per issued refresh token. Only a SHA-256 hash of the token is kept.
+/// Every login starts a new `familyId`; each rotation stays in the same family so
+/// a replayed (already rotated) token can revoke the whole session.
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  familyId  String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 4 - Game Management & Catalog
+// -----------------------------------------------------------------------------
+
+enum GameStatus {
+  DRAFT
+  ACTIVE
+  DISABLED
+}
+
+enum GameVisibility {
+  PUBLIC // listed in the catalog
+  HIDDEN // not listed, still reachable by game id
+  PRIVATE // admins only
+}
+
+enum GameOrientation {
+  LANDSCAPE
+  PORTRAIT
+  BOTH
+}
+
+enum GamePlatform {
+  DESKTOP
+  TABLET
+  MOBILE
+}
+
+/// State of the game's installed front-end package (filled by the future install workflow).
+enum PackageStatus {
+  NOT_INSTALLED
+  INSTALLING
+  INSTALLED
+  FAILED
+}
+
+model GameCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  games Game[]
+
+  @@map("game_categories")
+}
+
+/// A catalog entry. `gameId` is the public, immutable slug (data, not an enum), so new
+/// games need no code change.
+model Game {
+  id          String  @id @default(uuid())
+  gameId      String  @unique
+  name        String
+  description String?
+  developer   String?
+  categoryId  String
+  /// Reference to the thumbnail (relative path, asset key or URL) - never the image itself.
+  thumbnail   String?
+  version     String  @default("1.0.0")
+  status      GameStatus @default(DRAFT)
+
+  // Configuration
+  visibility       GameVisibility  @default(PUBLIC)
+  featured         Boolean         @default(false)
+  displayOrder     Int             @default(0)
+  orientation      GameOrientation @default(LANDSCAPE)
+  platforms        GamePlatform[]  @default([DESKTOP, TABLET, MOBILE])
+  minClientVersion String?
+  /// Free-form, game-specific settings (JSON object).
+  settings         Json            @default("{}")
+
+  // Package & publishing (written by the future install / publish workflows)
+  builtIn          Boolean       @default(false)
+  entryPoint       String?
+  packageStatus    PackageStatus @default(NOT_INSTALLED)
+  installedVersion String?
+  installedAt      DateTime?
+  publishedVersion String?
+  publishedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category GameCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  versions      GameVersion[]
+  packageEvents GamePackageEvent[]
+  sessions      GameSession[]
+  rounds        GameRound[]
+
+  @@index([categoryId])
+  @@index([status, visibility])
+  @@index([displayOrder])
+  @@map("games")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 5 - Game Package Management
+// -----------------------------------------------------------------------------
+
+enum GameVersionState {
+  UPLOADED // validated and stored, not unpacked yet
+  INSTALLED // unpacked on the server; can be published or rolled back to
+}
+
+enum PackageEventType {
+  UPLOADED
+  INSTALLED
+  PUBLISHED
+  UNPUBLISHED
+  ROLLED_BACK
+  UNINSTALLED
+}
+
+/// One uploaded package version. Append-only: a version number is never reused.
+model GameVersion {
+  id            String           @id @default(uuid())
+  gameId        String
+  version       String
+  releaseNotes  String?
+  fileName      String
+  /// Path of the stored ZIP relative to the package storage root.
+  storageKey    String
+  sizeBytes     Int
+  unpackedBytes Int
+  fileCount     Int
+  /// SHA-256 of the ZIP file (hex).
+  checksum      String
+  manifest      Json
+  entryPoint    String
+  /// Result of the server-side contract checks: { checks: [...], warnings: [...] }.
+  validation    Json
+  state         GameVersionState @default(UPLOADED)
+  uploadedById  String?
+  uploadedAt    DateTime         @default(now())
+  installedAt   DateTime?
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, version])
+  @@index([gameId, uploadedAt])
+  @@map("game_versions")
+}
+
+/// Package version history (who did what, when).
+model GamePackageEvent {
+  id        String           @id @default(uuid())
+  gameId    String
+  versionId String?
+  version   String
+  type      PackageEventType
+  note      String?
+  actorId   String?
+  createdAt DateTime         @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId, createdAt])
+  @@map("game_package_events")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 6 - Game Engine & Algorithms (demo credits only)
+// -----------------------------------------------------------------------------
+
+/// Free demo credits with no cash value. Never a real-money balance.
+/// Invariant (also enforced by the ledger code): balance = totalCredited - totalDebited, and balance >= 0.
+model DemoWallet {
+  id            String       @id @default(uuid())
+  userId        String       @unique
+  balance       Decimal      @db.Decimal(14, 2)
+  totalCredited Decimal      @default(0) @db.Decimal(16, 2)
+  totalDebited  Decimal      @default(0) @db.Decimal(16, 2)
+  status        WalletStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+
+  @@index([status])
+  @@map("demo_wallets")
+}
+
+enum GameSessionStatus {
+  ACTIVE
+  CLOSED
+  EXPIRED
+}
+
+enum GameRoundStatus {
+  IN_PROGRESS // e.g. a SKYFALL flight that has not crashed or been cashed out yet
+  SETTLED
+}
+
+/// A player's play session for one game. `state` is the engine's private carry-over
+/// state (free spins left, remaining card deck, ...). `version` is an optimistic lock.
+model GameSession {
+  id             String            @id @default(uuid())
+  userId         String
+  gameId         String
+  status         GameSessionStatus @default(ACTIVE)
+  state          Json
+  version        Int               @default(0)
+  roundCount     Int               @default(0)
+  totalStaked    Decimal           @default(0) @db.Decimal(16, 2)
+  totalPaid      Decimal           @default(0) @db.Decimal(16, 2)
+  startedAt      DateTime          @default(now())
+  lastActivityAt DateTime          @default(now())
+  endedAt        DateTime?
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game   Game    @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  rounds GameRound[]
+
+  @@index([userId, gameId, status])
+  @@map("game_sessions")
+}
+
+/// One round: the bet, the server-generated result and the audit trail needed to
+/// reproduce it (engine version, seed, session state before the round).
+model GameRound {
+  id                 String          @id @default(uuid())
+  sessionId          String
+  userId             String
+  gameId             String
+  roundNumber        Int
+  status             GameRoundStatus
+  version            Int             @default(0)
+  stake              Decimal         @db.Decimal(14, 2)
+  payout             Decimal         @default(0) @db.Decimal(14, 2)
+  bet                Json
+  /// Public result shown to the player.
+  result             Json
+  /// Private mid-round state (e.g. the SKYFALL crash point). Shown only after settlement.
+  roundState         Json
+  sessionStateBefore Json
+  engineVersion      String
+  /// The package version of the game that was published (and played) when the round started.
+  /// Null only for rounds stored before this field existed.
+  packageVersion     String?
+  /// Random seed of the round (hex). Hidden until the round is settled.
+  seed               String
+  /// SHA-256 of the seed, shown at round start so the seed cannot be swapped later.
+  seedCommitment     String
+  rngDraws           Int             @default(0)
+  balanceBefore      Decimal         @db.Decimal(14, 2)
+  balanceAfter       Decimal         @db.Decimal(14, 2)
+  startedAt          DateTime        @default(now())
+  settledAt          DateTime?
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  game    Game        @relation(fields: [gameId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, roundNumber])
+  @@index([userId, startedAt])
+  @@index([gameId, startedAt])
+  @@index([userId, gameId, startedAt])
+  @@index([status, startedAt])
+  @@map("game_rounds")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 7 - Demo Wallet & Credits (virtual credits only; no real money)
+// -----------------------------------------------------------------------------
+
+enum WalletStatus {
+  ACTIVE
+  SUSPENDED // no credits or debits are accepted
+}
+
+enum WalletTransactionType {
+  INITIAL_CREDIT
+  ADMIN_CREDIT
+  ADMIN_DEBIT
+  GAME_ENTRY_DEBIT
+  GAME_WINNING_CREDIT
+  GAME_REFUND
+  BONUS_CREDIT
+}
+
+enum WalletTransactionDirection {
+  CREDIT
+  DEBIT
+}
+
+/// Append-only ledger. Rows are never updated or deleted (a database trigger enforces this).
+/// `amount` is always positive; `direction` says whether it was added or taken.
+model WalletTransaction {
+  id             String                     @id @default(uuid())
+  walletId       String
+  userId         String
+  type           WalletTransactionType
+  direction      WalletTransactionDirection
+  amount         Decimal                    @db.Decimal(14, 2)
+  balanceBefore  Decimal                    @db.Decimal(14, 2)
+  balanceAfter   Decimal                    @db.Decimal(14, 2)
+  /// Related game (games.id), session and round, when the entry comes from play. Plain references so
+  /// the ledger never depends on, or changes with, those rows.
+  gameId         String?
+  sessionId      String?
+  roundId        String?
+  description    String
+  /// Globally unique. Repeating an operation with the same key returns the original entry instead of posting again.
+  idempotencyKey String                     @unique
+  /// The administrator who made an admin adjustment.
+  actorId        String?
+  createdAt      DateTime                   @default(now())
+
+  wallet DemoWallet @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([walletId, createdAt])
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([roundId])
+  @@index([gameId, createdAt])
+  @@map("wallet_transactions")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 9 - Admin activity & audit log
+// -----------------------------------------------------------------------------
+
+/// Append-only record of sensitive administrator actions (a database trigger rejects updates and deletes).
+/// `action` and `resourceType` are plain strings (see the constants in the audit module) so new
+/// actions need no migration.
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorId      String
+  /// e.g. USER_DEACTIVATED, PACKAGE_PUBLISHED, WALLET_CREDITED
+  action       String
+  /// e.g. USER, GAME, GAME_PACKAGE, WALLET
+  resourceType String
+  resourceId   String?
+  /// Request facts (route params, sanitised body, result summary, error message). Never secrets.
+  details      Json
+  /// False for refused or failed attempts (403, 409, server errors).
+  success      Boolean  @default(true)
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

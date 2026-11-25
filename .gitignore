@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.test-dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+npm-debug.log*
+.DS_Store
+
+# Uploaded game packages (Phase 5)
+storage/
