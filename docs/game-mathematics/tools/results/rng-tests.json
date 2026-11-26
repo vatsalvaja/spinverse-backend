@@ -1,0 +1,72 @@
+{
+  "int(37) uniform, 10M draws": {
+    "chiSquare": 34.016058399999984,
+    "df": 36,
+    "pValue": 0.563249823630438,
+    "min": 269424,
+    "max": 271422,
+    "expected": 270270.2702702703
+  },
+  "first draw of 4M different seeds, int(37)": {
+    "chiSquare": 44.26468700000001,
+    "df": 36,
+    "pValue": 0.16222298656182532
+  },
+  "Neon: orbs per 20-cell grid ~ Binomial(20,.07)": {
+    "grids": 2000000,
+    "chiSquare": 4.094362169397594,
+    "df": 7,
+    "pValue": 0.7688468651700031,
+    "triggerCount": 3782,
+    "expectedTriggers": 3866.39413784905,
+    "zScore": -1.3585618463294113
+  },
+  "float(): 4M draws": {
+    "mean": 0.499947112104646,
+    "expectedMean": 0.5,
+    "variance": 0.08336815014932564,
+    "expectedVariance": 0.08333333333333333,
+    "ksStatistic": 0.0003369755625375892,
+    "ksCritical1pct": 0.000815,
+    "chiSquare100bins": 79.1396,
+    "pValue": 0.9292758281190066,
+    "lag1Correlation": -0.00016632113878174012,
+    "minValue": 2.819644266960353e-7,
+    "maxValue": 0.9999999920304031
+  },
+  "shuffle: where card 0 lands (52 positions)": {
+    "chiSquare": 46.63471999999999,
+    "df": 51,
+    "pValue": 0.6475303347738477
+  },
+  "shuffle: which card is on top (52 cards)": {
+    "chiSquare": 59.72589333333331,
+    "df": 51,
+    "pValue": 0.18826799262215776
+  },
+  "shuffle: top two cards share a rank (= tie)": {
+    "observed": 35219,
+    "expected": 35294.117647058825,
+    "zScore": -0.4121499777589153,
+    "observedRate": 0.05869833333333333,
+    "theoretical": 0.058823529411764705
+  },
+  "chance(15000/1e6) and chance(20000/1e6)": {
+    "wildRate": 0.01493925,
+    "wildZ": -0.9995684347945185,
+    "scatterRate": 0.01993525,
+    "scatterZ": -0.925
+  },
+  "int(3e9): share below the middle": {
+    "rate": 0.500093,
+    "expected": 0.5,
+    "zScore": 0.2630437226013957
+  },
+  "determinism / commitment / seed uniqueness": {
+    "sameSeedSameStream": true,
+    "differentSeedDifferentStream": true,
+    "commitmentIsSha256OfSeedBytes": true,
+    "seedLengthBits": 256,
+    "uniqueSeedsIn100000": 100000
+  }
+}

@@ -13,6 +13,15 @@ export const ADMIN_WALLET_API_TAG = 'Admin - Demo Wallets';
  */
 export const DEMO_STARTING_CREDITS = 5000;
 
+/**
+ * Hierarchy accounts start with an empty wallet: their coins come only from the allocation above them
+ * (Super Admin -> Master -> Client), never from the free starting credits that standalone players get.
+ */
+export const ZERO_START_ROLES: readonly string[] = ['SUPER_ADMIN', 'MASTER', 'CLIENT'];
+
+/** Roles whose wallets only the Super Admin may adjust by hand; everyone else's coins move through allocations. */
+export const HIERARCHY_WALLET_ROLES: readonly string[] = ['MASTER', 'CLIENT'];
+
 /** Limits for one administrative adjustment. */
 export const ADMIN_ADJUSTMENT_MIN = 0.01;
 export const ADMIN_ADJUSTMENT_MAX = 1_000_000;
@@ -30,6 +39,10 @@ export const TRANSACTION_DIRECTION: Record<WalletTransactionType, WalletTransact
   BONUS_CREDIT: 'CREDIT',
   ADMIN_DEBIT: 'DEBIT',
   GAME_ENTRY_DEBIT: 'DEBIT',
+  COIN_ALLOCATION_CREDIT: 'CREDIT',
+  COIN_RECLAIM_CREDIT: 'CREDIT',
+  COIN_ALLOCATION_DEBIT: 'DEBIT',
+  COIN_RECLAIM_DEBIT: 'DEBIT',
 };
 
 /** Types an administrator may choose when adding credits. */
@@ -45,6 +58,7 @@ export const WALLET_ERRORS = {
   IDEMPOTENCY_CONFLICT: 'This idempotency key was already used for a different operation',
   WRONG_TYPE: 'That transaction type cannot be used for this operation',
   SELF_ADJUSTMENT: 'Administrators cannot adjust their own wallet',
+  HIERARCHY_ADJUSTMENT: 'Master and client wallets can only be changed by a Super Admin or through coin allocations',
   INVALID_RANGE: '"from" must not be after "to"',
   REFUND_NO_ENTRY: 'There is no game entry to refund for this round',
   REFUND_ALREADY_PAID: 'This round already paid out winnings, so its entry cannot be refunded',

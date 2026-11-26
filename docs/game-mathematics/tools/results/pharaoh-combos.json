@@ -1,0 +1,199 @@
+{
+  "weightsTotal": 63,
+  "lines": 5,
+  "probabilityNoWinOnALine": 0.9680821295592852,
+  "probabilityWinOnALine": 0.03191787044071481,
+  "rows": [
+    {
+      "symbol": "pharaoh",
+      "count": 5,
+      "multiple": 1000,
+      "probability": 1.0076210988534706e-9,
+      "sequences": 1,
+      "withWild": 0,
+      "rtpPerLine": 0.0000010076210988534706,
+      "oneIn": 992436543.0000004
+    },
+    {
+      "symbol": "anubis",
+      "count": 5,
+      "multiple": 40,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.006491095118814059,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "horus",
+      "count": 5,
+      "multiple": 40,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.006491095118814059,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "sphinx",
+      "count": 5,
+      "multiple": 40,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.006491095118814059,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "temple",
+      "count": 5,
+      "multiple": 15,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.0024341606695552722,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "coin",
+      "count": 5,
+      "multiple": 15,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.0024341606695552722,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "jewel",
+      "count": 5,
+      "multiple": 15,
+      "probability": 0.00016227737797035147,
+      "sequences": 31,
+      "withWild": 0.00006151526808500439,
+      "rtpPerLine": 0.0024341606695552722,
+      "oneIn": 6162.28837628066
+    },
+    {
+      "symbol": "anubis",
+      "count": 4,
+      "multiple": 12,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.009204981481622045,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "horus",
+      "count": 4,
+      "multiple": 12,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.009204981481622045,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "sphinx",
+      "count": 4,
+      "multiple": 12,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.009204981481622045,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "temple",
+      "count": 4,
+      "multiple": 5,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.0038354089506758516,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "coin",
+      "count": 4,
+      "multiple": 5,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.0038354089506758516,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "jewel",
+      "count": 4,
+      "multiple": 5,
+      "probability": 0.0007670817901351704,
+      "sequences": 90,
+      "withWild": 0.0002431188187313654,
+      "rtpPerLine": 0.0038354089506758516,
+      "oneIn": 1303.6419490857504
+    },
+    {
+      "symbol": "anubis",
+      "count": 3,
+      "multiple": 4,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.017561142949569886,
+      "oneIn": 227.7756072874499
+    },
+    {
+      "symbol": "horus",
+      "count": 3,
+      "multiple": 4,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.017561142949569886,
+      "oneIn": 227.7756072874499
+    },
+    {
+      "symbol": "sphinx",
+      "count": 3,
+      "multiple": 4,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.017561142949569886,
+      "oneIn": 227.7756072874499
+    },
+    {
+      "symbol": "temple",
+      "count": 3,
+      "multiple": 2,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.008780571474784943,
+      "oneIn": 227.7756072874499
+    },
+    {
+      "symbol": "coin",
+      "count": 3,
+      "multiple": 2,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.008780571474784943,
+      "oneIn": 227.7756072874499
+    },
+    {
+      "symbol": "jewel",
+      "count": 3,
+      "multiple": 2,
+      "probability": 0.004390285737392472,
+      "sequences": 336,
+      "withWild": 0.001141715314688892,
+      "rtpPerLine": 0.008780571474784943,
+      "oneIn": 227.7756072874499
+    }
+  ],
+  "expectedMultiplePerLine": 0.14492308955616504
+}

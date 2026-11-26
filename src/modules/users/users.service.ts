@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { NO_FIELDS_TO_UPDATE } from '../../common/constants/validation.constants';
+import { Role } from '../../common/enums/role.enum';
 import { SortOrder } from '../../common/enums/sort-order.enum';
 import { PaginatedResult } from '../../common/interfaces/pagination.interface';
 import { hasDefinedValues } from '../../common/utils/object.util';
@@ -20,6 +21,8 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CreateUserData, SafeUser } from './interfaces/user.interface';
 import { DemoWalletService } from '../demo-wallet/demo-wallet.service';
 import { UsersRepository } from './users.repository';
+
+const HIERARCHY_ROLES: Role[] = [Role.SUPER_ADMIN, Role.MASTER, Role.CLIENT];
 
 @Injectable()
 export class UsersService {
@@ -63,6 +66,13 @@ export class UsersService {
   /** Labels (id, name, e-mail) for a set of user ids. */
   findSummaries(ids: string[]): Promise<{ id: string; name: string; email: string }[]> {
     return this.usersRepository.findSummaries([...new Set(ids)]);
+  }
+
+  /** The master a CLIENT belongs to (id, name, e-mail), for login and /auth/me. Null for accounts without a parent. */
+  async getParentSummary(user: Pick<SafeUser, 'parentId'>): Promise<{ id: string; name: string; email: string } | null> {
+    if (!user.parentId) return null;
+    const [parent] = await this.usersRepository.findSummaries([user.parentId]);
+    return parent ?? null;
   }
 
   getCounts() {
@@ -119,7 +129,12 @@ export class UsersService {
     if (!hasDefinedValues(dto)) throw new BadRequestException(NO_FIELDS_TO_UPDATE);
 
     const target = await this.getByIdOrFail(id);
+    this.assertMayModify(actor, target);
+    if (target.deletedAt) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
+    if (dto.role !== undefined && dto.role !== target.role && HIERARCHY_ROLES.includes(target.role)) {
+      throw new ForbiddenException(USER_ERRORS.HIERARCHY_ROLE_LOCKED);
+    }
     if (dto.role !== undefined && dto.role !== target.role && actor.id === target.id) {
       throw new ForbiddenException(USER_ERRORS.CANNOT_CHANGE_OWN_ROLE);
     }
@@ -139,6 +154,8 @@ export class UsersService {
   /** Activates or deactivates an account. Admins cannot deactivate themselves. */
   async setActive(actor: SafeUser, id: string, isActive: boolean): Promise<SafeUser> {
     const target = await this.getByIdOrFail(id);
+    this.assertMayModify(actor, target);
+    if (target.deletedAt) throw new NotFoundException(USER_ERRORS.NOT_FOUND);
 
     if (!isActive && actor.id === target.id) {
       throw new ForbiddenException(USER_ERRORS.CANNOT_DEACTIVATE_SELF);
@@ -146,6 +163,13 @@ export class UsersService {
     if (target.isActive === isActive) return target;
 
     return this.usersRepository.update(id, { isActive });
+  }
+
+  /** A Super Admin account can only be changed by a Super Admin (never by a plain ADMIN). */
+  private assertMayModify(actor: SafeUser, target: SafeUser): void {
+    if (target.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
+      throw new ForbiddenException(USER_ERRORS.SUPER_ADMIN_PROTECTED);
+    }
   }
 
   private async getByIdOrFail(id: string): Promise<SafeUser> {

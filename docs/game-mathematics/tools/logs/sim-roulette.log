@@ -1,0 +1,152 @@
+{
+ "game": "roulette",
+ "spins": 1000000,
+ "theoreticalRtp": 0.972973,
+ "perPosition": {
+  "straight:17": {
+   "label": "straight:17",
+   "rounds": 1000000,
+   "rtp": 0.983088,
+   "standardError": 0.00586726,
+   "ci95": [
+    0.971588,
+    0.994588
+   ]
+  },
+  "split:8-9": {
+   "label": "split:8-9",
+   "rounds": 1000000,
+   "rtp": 0.970722,
+   "standardError": 0.0040658,
+   "ci95": [
+    0.962753,
+    0.978691
+   ]
+  },
+  "street:7": {
+   "label": "street:7",
+   "rounds": 1000000,
+   "rtp": 0.972444,
+   "standardError": 0.0032747,
+   "ci95": [
+    0.966026,
+    0.978862
+   ]
+  },
+  "corner:1": {
+   "label": "corner:1",
+   "rounds": 1000000,
+   "rtp": 0.976194,
+   "standardError": 0.00279871,
+   "ci95": [
+    0.970709,
+    0.981679
+   ]
+  },
+  "sixline:1": {
+   "label": "sixline:1",
+   "rounds": 1000000,
+   "rtp": 0.973104,
+   "standardError": 0.00221172,
+   "ci95": [
+    0.968769,
+    0.977439
+   ]
+  },
+  "dozen:2": {
+   "label": "dozen:2",
+   "rounds": 1000000,
+   "rtp": 0.971028,
+   "standardError": 0.00140363,
+   "ci95": [
+    0.968277,
+    0.973779
+   ]
+  },
+  "column:3": {
+   "label": "column:3",
+   "rounds": 1000000,
+   "rtp": 0.971661,
+   "standardError": 0.00140387,
+   "ci95": [
+    0.968909,
+    0.974413
+   ]
+  },
+  "red": {
+   "label": "red",
+   "rounds": 1000000,
+   "rtp": 0.9725,
+   "standardError": 0.000999622,
+   "ci95": [
+    0.970541,
+    0.974459
+   ]
+  },
+  "black": {
+   "label": "black",
+   "rounds": 1000000,
+   "rtp": 0.972818,
+   "standardError": 0.000999631,
+   "ci95": [
+    0.970859,
+    0.974777
+   ]
+  },
+  "odd": {
+   "label": "odd",
+   "rounds": 1000000,
+   "rtp": 0.972176,
+   "standardError": 0.000999613,
+   "ci95": [
+    0.970217,
+    0.974135
+   ]
+  },
+  "even": {
+   "label": "even",
+   "rounds": 1000000,
+   "rtp": 0.973142,
+   "standardError": 0.00099964,
+   "ci95": [
+    0.971183,
+    0.975101
+   ]
+  },
+  "low": {
+   "label": "low",
+   "rounds": 1000000,
+   "rtp": 0.974412,
+   "standardError": 0.000999673,
+   "ci95": [
+    0.972453,
+    0.976371
+   ]
+  },
+  "high": {
+   "label": "high",
+   "rounds": 1000000,
+   "rtp": 0.970906,
+   "standardError": 0.000999577,
+   "ci95": [
+    0.968947,
+    0.972865
+   ]
+  }
+ },
+ "allThirteenBetsTogether": {
+  "label": "all 13 positions together",
+  "rounds": 1000000,
+  "rtp": 0.9734,
+  "standardError": 0.000735002,
+  "ci95": [
+   0.971959,
+   0.97484
+  ]
+ },
+ "pocketUniformity": {
+  "chiSquare": 42.3109,
+  "degreesOfFreedom": 36,
+  "pValue": 0.217153,
+  "minCount": 26678,
+  "maxCount": 27348

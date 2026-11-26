@@ -47,11 +47,17 @@ class FakeUsersService {
       ...data,
       role: Role.USER,
       isActive: true,
+      parentId: null,
+      deletedAt: null,
       createdAt: now,
       updatedAt: now,
     };
     this.records.push(record);
     return this.strip(record);
+  }
+
+  async getParentSummary(): Promise<null> {
+    return null;
   }
 
   private strip({ passwordHash: _omit, ...user }: User): SafeUser {
@@ -255,6 +261,8 @@ describe('TokenService', () => {
     email: 'jane@example.com',
     role: Role.ADMIN,
     isActive: true,
+    parentId: null,
+    deletedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

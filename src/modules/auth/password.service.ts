@@ -5,11 +5,16 @@ import { AUTH_CONFIG_KEY, AuthConfig } from '../../config/auth.config';
 
 @Injectable()
 export class PasswordService {
-  private readonly saltRounds: number;
   private dummyHash?: Promise<string>;
 
-  constructor(configService: ConfigService) {
-    this.saltRounds = configService.getOrThrow<AuthConfig>(AUTH_CONFIG_KEY).bcryptSaltRounds;
+  constructor(private readonly configService: ConfigService) {}
+
+  /**
+   * Read when first needed (not in the constructor): this service is also provided by the users module, which can be
+   * created before the auth module has registered its configuration.
+   */
+  private get saltRounds(): number {
+    return this.configService.getOrThrow<AuthConfig>(AUTH_CONFIG_KEY).bcryptSaltRounds;
   }
 
   hash(password: string): Promise<string> {

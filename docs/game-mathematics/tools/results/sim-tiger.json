@@ -1,0 +1,53 @@
+{
+  "game": "tiger-clash",
+  "rounds": 1000000,
+  "stake": 100,
+  "theoretical": {
+    "tiger": 0.9705882352941176,
+    "dragon": 0.9705882352941176,
+    "tie": 0.5294117647058824,
+    "pTie": 0.058823529411764705
+  },
+  "results": {
+    "tiger": {
+      "label": "tiger bet",
+      "rounds": 1000000,
+      "rtp": 0.9703274999999962,
+      "standardError": 0.0009772856531388467,
+      "ci95": [
+        0.9684120201198441,
+        0.9722429798801484
+      ],
+      "tieFrequency": 0.058711,
+      "roundsPerReshuffle": 25.999688003743955,
+      "violations": []
+    },
+    "dragon": {
+      "label": "dragon bet",
+      "rounds": 1000000,
+      "rtp": 0.9713905000000529,
+      "standardError": 0.0009771124302036416,
+      "ci95": [
+        0.9694753596368537,
+        0.973305640363252
+      ],
+      "tieFrequency": 0.059245,
+      "roundsPerReshuffle": 25.999688003743955,
+      "violations": []
+    },
+    "tie": {
+      "label": "tie bet",
+      "rounds": 1000000,
+      "rtp": 0.5312250000000092,
+      "standardError": 0.0021210444356977985,
+      "ci95": [
+        0.5270677529060415,
+        0.5353822470939769
+      ],
+      "tieFrequency": 0.059025,
+      "roundsPerReshuffle": 25.999688003743955,
+      "violations": []
+    }
+  },
+  "seconds": 27.785
+}

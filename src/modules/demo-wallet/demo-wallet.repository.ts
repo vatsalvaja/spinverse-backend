@@ -7,6 +7,7 @@ import { WalletSortField } from './enums/wallet-sort-field.enum';
 import { WalletTransactionType } from './enums/wallet-transaction-type.enum';
 import { WalletListFilter, WalletWithUser } from './interfaces/demo-wallet.interface';
 import { WalletLedgerRepository } from './wallet-ledger.repository';
+import { ZERO_START_ROLES } from './constants/demo-wallet.constants';
 import { WalletNotEligibleError } from './wallet.errors';
 
 const WITH_USER = {
@@ -24,6 +25,12 @@ export class DemoWalletRepository {
     return this.prisma.demoWallet.findUnique({ where: { userId } });
   }
 
+  /** The role of an account, whether or not it has a wallet yet. */
+  async findUserRole(userId: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    return user?.role ?? null;
+  }
+
   findByUserIdWithUser(userId: string): Promise<WalletWithUser | null> {
     return this.prisma.demoWallet.findUnique({ where: { userId }, include: WITH_USER });
   }
@@ -35,11 +42,13 @@ export class DemoWalletRepository {
    */
   createWithInitialCredit(userId: string, startingBalance: number): Promise<DemoWallet> {
     return this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId }, select: { isActive: true } });
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { isActive: true, role: true } });
       if (!user) throw new WalletNotEligibleError('not_found');
       if (!user.isActive) throw new WalletNotEligibleError('inactive');
 
       const wallet = await tx.demoWallet.create({ data: { userId, balance: '0.00' } });
+      // Super Admin / Master / Client wallets start empty (balance 0, no ledger line); coins arrive by allocation.
+      if (ZERO_START_ROLES.includes(user.role)) return tx.demoWallet.findUniqueOrThrow({ where: { id: wallet.id } });
       await this.ledger.post(tx, {
         userId,
         type: WalletTransactionType.INITIAL_CREDIT,

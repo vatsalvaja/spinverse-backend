@@ -1,0 +1,122 @@
+{
+ "game": "skyfall",
+ "roundsPerTarget": 1000000,
+ "stakePerRound": 100,
+ "automatic": {
+  "2": {
+   "label": "auto cash-out 2x",
+   "rounds": 1000000,
+   "rtp": 0.950068,
+   "standardError": 0.000998753,
+   "ci95": [
+    0.94811,
+    0.952026
+   ],
+   "winFrequency": 0.475034,
+   "theoreticalWinFrequency": 0.475,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 200,
+   "violations": []
+  },
+  "3": {
+   "label": "auto cash-out 3x",
+   "rounds": 1000000,
+   "rtp": 0.950238,
+   "standardError": 0.00139562,
+   "ci95": [
+    0.947503,
+    0.952973
+   ],
+   "winFrequency": 0.316746,
+   "theoreticalWinFrequency": 0.316667,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 300,
+   "violations": []
+  },
+  "5": {
+   "label": "auto cash-out 5x",
+   "rounds": 1000000,
+   "rtp": 0.95094,
+   "standardError": 0.00196225,
+   "ci95": [
+    0.947094,
+    0.954786
+   ],
+   "winFrequency": 0.190188,
+   "theoreticalWinFrequency": 0.19,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 500,
+   "violations": []
+  },
+  "10": {
+   "label": "auto cash-out 10x",
+   "rounds": 1000000,
+   "rtp": 0.94731,
+   "standardError": 0.00292843,
+   "ci95": [
+    0.94157,
+    0.95305
+   ],
+   "winFrequency": 0.094731,
+   "theoreticalWinFrequency": 0.095,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 1000,
+   "violations": []
+  },
+  "25": {
+   "label": "auto cash-out 25x",
+   "rounds": 1000000,
+   "rtp": 0.95345,
+   "standardError": 0.00478824,
+   "ci95": [
+    0.944065,
+    0.962835
+   ],
+   "winFrequency": 0.038138,
+   "theoreticalWinFrequency": 0.038,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 2500,
+   "violations": []
+  },
+  "100": {
+   "label": "auto cash-out 100x",
+   "rounds": 1000000,
+   "rtp": 0.9625,
+   "standardError": 0.00976339,
+   "ci95": [
+    0.943364,
+    0.981636
+   ],
+   "winFrequency": 0.009625,
+   "theoreticalWinFrequency": 0.0095,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 10000,
+   "violations": []
+  },
+  "500": {
+   "label": "auto cash-out 500x",
+   "rounds": 1000000,
+   "rtp": 0.9315,
+   "standardError": 0.0215611,
+   "ci95": [
+    0.88924,
+    0.97376
+   ],
+   "winFrequency": 0.001863,
+   "theoreticalWinFrequency": 0.0019,
+   "theoreticalRtp": 0.95,
+   "maxPayoutObserved": 50000,
+   "violations": []
+  },
+  "1000": {
+   "label": "auto cash-out 1000x",
+   "rounds": 1000000,
+   "rtp": 0.903,
+   "standardError": 0.0300364,
+   "ci95": [
+    0.844129,
+    0.961871
+   ],
+   "winFrequency": 0.000903,
+   "theoreticalWinFrequency": 0.00095,
+   "theoretic

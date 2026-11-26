@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { SortParams } from '../../common/interfaces/pagination.interface';
 import { toSortDirection } from '../../common/utils/pagination.util';
 import { PrismaService } from '../../database/prisma.service';
@@ -13,6 +13,8 @@ const SAFE_USER_SELECT = {
   email: true,
   role: true,
   isActive: true,
+  parentId: true,
+  deletedAt: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.UserSelect;
@@ -46,11 +48,11 @@ export class UsersRepository {
   }> {
     const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000);
     const [total, active, byRole, last7, last30] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.user.count({ where: { isActive: true } }),
-      this.prisma.user.groupBy({ by: ['role'], _count: { _all: true }, orderBy: { role: 'asc' } }),
-      this.prisma.user.count({ where: { createdAt: { gte: daysAgo(7) } } }),
-      this.prisma.user.count({ where: { createdAt: { gte: daysAgo(30) } } }),
+      this.prisma.user.count({ where: { deletedAt: null } }),
+      this.prisma.user.count({ where: { isActive: true, deletedAt: null } }),
+      this.prisma.user.groupBy({ by: ['role'], where: { deletedAt: null }, _count: { _all: true }, orderBy: { role: 'asc' } }),
+      this.prisma.user.count({ where: { createdAt: { gte: daysAgo(7) }, deletedAt: null } }),
+      this.prisma.user.count({ where: { createdAt: { gte: daysAgo(30) }, deletedAt: null } }),
     ]);
     return {
       total,
@@ -88,6 +90,34 @@ export class UsersRepository {
 
   create(data: CreateUserData): Promise<SafeUser> {
     return this.prisma.user.create({ data, select: SAFE_USER_SELECT });
+  }
+
+  /** A live (not deleted) account of the given role, optionally owned by one master. */
+  findManaged(id: string, role: Role, parentId?: string): Promise<SafeUser | null> {
+    return this.prisma.user.findFirst({
+      where: { id, role, deletedAt: null, ...(parentId ? { parentId } : {}) },
+      select: SAFE_USER_SELECT,
+    });
+  }
+
+  /** Number of live clients per master, for a set of masters, plus how many of them are active. */
+  async countClientsByMaster(masterIds: string[]): Promise<Map<string, { total: number; active: number }>> {
+    const result = new Map<string, { total: number; active: number }>();
+    if (masterIds.length === 0) return result;
+    const rows = await this.prisma.user.groupBy({
+      by: ['parentId', 'isActive'],
+      where: { parentId: { in: masterIds }, deletedAt: null },
+      _count: { _all: true },
+      orderBy: { parentId: 'asc' },
+    });
+    for (const row of rows) {
+      if (!row.parentId) continue;
+      const entry = result.get(row.parentId) ?? { total: 0, active: 0 };
+      entry.total += row._count._all;
+      if (row.isActive) entry.active += row._count._all;
+      result.set(row.parentId, entry);
+    }
+    return result;
   }
 
   update(id: string, data: UpdateUserData): Promise<SafeUser> {
@@ -129,8 +159,11 @@ export class UsersRepository {
     }
     if (filter.role) conditions.push({ role: filter.role });
     if (filter.isActive !== undefined) conditions.push({ isActive: filter.isActive });
+    if (filter.parentId) conditions.push({ parentId: filter.parentId });
+    // soft-deleted accounts never appear in a list
+    conditions.push({ deletedAt: null });
 
-    return conditions.length > 0 ? { AND: conditions } : {};
+    return { AND: conditions };
   }
 
   /** `id` is the tie-breaker so pages are stable when the sort column has duplicates. */

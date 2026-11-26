@@ -3,7 +3,8 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { PaginatedResult } from '../../common/interfaces/pagination.interface';
 import { buildPaginatedResult, toSkipTake } from '../../common/utils/pagination.util';
 import { SafeUser } from '../users/interfaces/user.interface';
-import { WALLET_ERRORS } from './constants/demo-wallet.constants';
+import { Role } from '../../common/enums/role.enum';
+import { HIERARCHY_WALLET_ROLES, WALLET_ERRORS } from './constants/demo-wallet.constants';
 import { ListWalletsQueryDto, WalletStatsQueryDto } from './dto/admin-wallet-queries.dto';
 import { AdminListWalletTransactionsQueryDto } from './dto/list-wallet-transactions-query.dto';
 import { CreditWalletDto, DebitWalletDto } from './dto/wallet-adjustment.dto';
@@ -99,6 +100,13 @@ export class AdminWalletService {
   ): Promise<AdjustmentResult> {
     // Segregation of duties: nobody can top up (or drain) their own wallet.
     if (actor.id === userId) throw new ForbiddenException(WALLET_ERRORS.SELF_ADJUSTMENT);
+
+    // Coins in the Super Admin -> Master -> Client hierarchy move only through allocations (which keep every
+    // balance traceable to a sender). A manual adjustment of those wallets is reserved for the Super Admin.
+    if (actor.role !== Role.SUPER_ADMIN) {
+      const targetRole = await this.walletRepository.findUserRole(userId);
+      if (targetRole && HIERARCHY_WALLET_ROLES.includes(targetRole)) throw new ForbiddenException(WALLET_ERRORS.HIERARCHY_ADJUSTMENT);
+    }
 
     // The key is namespaced by administrator and player, so one admin's key can never replay another's operation.
     const idempotencyKey = dto.idempotencyKey

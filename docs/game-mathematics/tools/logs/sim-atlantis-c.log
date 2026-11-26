@@ -1,0 +1,10 @@
+atlantis-cascade:10:c: 100000/1000000
+atlantis-cascade:10:c: 200000/1000000
+atlantis-cascade:10:c: 300000/1000000
+atlantis-cascade:10:c: 400000/1000000
+atlantis-cascade:10:c: 500000/1000000
+atlantis-cascade:10:c: 600000/1000000
+atlantis-cascade:10:c: 700000/1000000
+atlantis-cascade:10:c: 800000/1000000
+atlantis-cascade:10:c: 900000/1000000
+atlantis-cascade:10:c: RTP 95.910% (+-0.529)  hit 55.22%  sd 2.70  max 415.8x  violations 0

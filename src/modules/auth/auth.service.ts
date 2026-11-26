@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { AUTH_ERRORS } from './constants/auth.constants';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { AuthSession, AuthTokens } from './interfaces/auth-session.interface';
+import { AuthProfile, AuthSession, AuthTokens } from './interfaces/auth-session.interface';
 import { PasswordService } from './password.service';
 import { RefreshTokenRepository } from './refresh-token.repository';
 import { TokenService } from './token.service';
@@ -106,7 +106,12 @@ export class AuthService {
       familyId: randomUUID(),
       expiresAt: issued.refreshTokenExpiresAt,
     });
-    return { user, tokens: issued.tokens };
+    return { user, master: await this.usersService.getParentSummary(user), tokens: issued.tokens };
+  }
+
+  /** The signed-in user with its owning master (for a CLIENT), as returned by `GET /auth/me`. */
+  async getProfile(user: SafeUser): Promise<AuthProfile> {
+    return { ...user, master: await this.usersService.getParentSummary(user) };
   }
 
   private invalidRefreshToken(): UnauthorizedException {

@@ -1,0 +1,59 @@
+{
+  "game": "pharaohs-fortune",
+  "engineVersion": "1.0.0",
+  "bet": 50,
+  "paidRounds": 1000000,
+  "engineRounds": 1114995,
+  "freeSpinRounds": 114995,
+  "totalStake": 50000000,
+  "totalPayout": 44184100,
+  "rtp": 0.883682,
+  "rtpStandardError": 0.0033601031848991673,
+  "rtp95Interval": [
+    0.8770961977575976,
+    0.8902678022424023
+  ],
+  "standardDeviationPerPaidRound": 3.360103184899167,
+  "maxReturnObserved": 109,
+  "hitFrequencyIncludingFeature": 0.157417,
+  "baseSpinHitFrequency": 0.157417,
+  "featureTriggerRate": 0.010984,
+  "freeSpinsAwardedTotal": 114995,
+  "returnThresholds": {
+    ">=1e-7": 0.157417,
+    ">=1": 0.157417,
+    ">=2": 0.157417,
+    ">=5": 0.043079,
+    ">=10": 0.023047,
+    ">=25": 0.003995,
+    ">=50": 0.000328,
+    ">=100": 0.000001,
+    ">=250": 0,
+    ">=500": 0,
+    ">=1000": 0
+  },
+  "componentCredits": {
+    "baseLines": 36043250,
+    "scatterPrize": 3519250,
+    "freeSpinLines": 4621600
+  },
+  "componentRtp": {
+    "baseLines": 0.720865,
+    "scatterPrize": 0.070385,
+    "freeSpinLines": 0.092432
+  },
+  "maxCreditObserved": 4250,
+  "maxCascadesObserved": 0,
+  "extra": {
+    "scatters_1": 302739,
+    "paidSpinsWithLineWin": 147344,
+    "scatters_0": 616556,
+    "scatters_3": 9953,
+    "twoScatterTeases": 69721,
+    "scatters_2": 69721,
+    "scatters_4": 958,
+    "scatters_5": 73
+  },
+  "invariantViolations": 0,
+  "violations": []
+}

@@ -87,6 +87,8 @@ The Prisma schema lives in [`prisma/schema.prisma`](prisma/schema.prisma) and th
 | `20261127090000_add_packages_and_game_engine` | `game_versions`, `game_package_events` (Phase 5); `demo_wallets`, `game_sessions`, `game_rounds` (Phase 6) |
 | `20261129090000_add_game_history_and_audit_logs` | `game_rounds.packageVersion` and history indexes (Phase 8); `audit_logs` and the `UNINSTALLED` package event (Phase 9). Hand-written SQL: the audit log is append-only and a settled round can never be changed or deleted |
 | `20261128090000_add_wallet_ledger` | `wallet_transactions` and wallet status/totals (Phase 7). Also hand-written SQL: opening ledger entries for wallets that already exist, `CHECK` constraints, and triggers that make the ledger append-only |
+| `20261130090000_add_hierarchy_enum_values` | Super Admin / Master / Client hierarchy, step 1 (Phase 10): the new `Role` values (`SUPER_ADMIN`, `MASTER`, `CLIENT`) and the four `COIN_*` wallet transaction types. Enum values only; no existing row changes. Needs PostgreSQL 12+ |
+| `20261130090100_add_user_hierarchy_and_coin_transfers` | Step 2 (Phase 10): `users.parentId` (FK) and `users.deletedAt`, the `coin_transfers` table. Hand-written SQL: the parent/role `CHECK` and triggers, transfer shape `CHECK`s, a trigger that validates who may send to whom, and append-only triggers on `coin_transfers` |
 
 **After creating your empty database and filling `.env`, apply them:**
 
@@ -149,6 +151,7 @@ Once running (default port):
 | `npm run typecheck`       | Type-check without emitting              |
 | `npm test`                | Compile and run the unit tests (no database needed) |
 | `npm run prisma:*`        | Prisma generate / validate / migrate / studio |
+| `npm run prisma:create-super-admin` | Create (or promote to) the first `SUPER_ADMIN` from `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` in the environment |
 
 ## API response format
 
@@ -279,7 +282,7 @@ The guard re-loads the user from the database on every request, so deactivating 
 
 ### Creating the first admin
 
-Registration always creates a `USER`. Promote an account manually once it exists:
+Registration always creates a `USER`. For the Super Admin / Master / Client hierarchy (Phase 10) create the first `SUPER_ADMIN` with `npm run prisma:create-super-admin` (see *Super Admin, Master & Client hierarchy*). A plain platform `ADMIN` can still be promoted manually once the account exists:
 
 ```sql
 UPDATE users SET role = 'ADMIN' WHERE email = 'you@example.com';
@@ -630,6 +633,195 @@ admin-dashboard/   dashboard + reports (composition only: no repository of its o
 audit/             AuditLog model access, @Audit decorator, interceptor, read-only API (global module)
 game-history/      round history, statistics, report queries (read-only over game_rounds)
 ```
+
+## Super Admin, Master & Client hierarchy (Phase 10)
+
+A management layer on top of the existing authentication, user, demo-wallet and ledger modules. **There is no second user or wallet system**: Masters and Clients are ordinary `users` rows (with a new role and a `parentId`), and their coins are the ordinary `demo_wallets` balance that the games already read and spend.
+
+### User hierarchy
+
+```
+SUPER_ADMIN ── creates and manages ──> MASTER ── creates and manages ──> CLIENT
+ (issues coins)                        (distributes coins)               (plays the games)
+```
+
+| Role | Created by | Can do |
+| --- | --- | --- |
+| `SUPER_ADMIN` | the one-off bootstrap script (below) | everything under `/super-admin/*`; also passes every existing `ADMIN` route (the admin console APIs) |
+| `MASTER` | a Super Admin | everything under `/master/*`, only for **their own** clients |
+| `CLIENT` | a Master | the normal player APIs (`/wallet`, `/games/*`, `/game-sessions/*`, ...) |
+| `ADMIN`, `USER` | unchanged | exactly as before (platform admin, standalone player) |
+
+- **Parent link:** `users.parentId` is a real foreign key to `users.id`. It is set **only** for `CLIENT` accounts and always points to a `MASTER`. The database itself enforces it (see *Database rules*), not just the API.
+- **`parentId` is never trusted from a request.** The role of a new account is fixed by the endpoint (`POST /super-admin/masters` always makes a `MASTER`; `POST /master/clients` always makes a `CLIENT`), and a client's `parentId` is **always the authenticated master's id**. Create/update bodies accept only `name`, `email`, `password`; a body that contains `role`, `parentId` or anything else is rejected with `400`.
+- **Master isolation:** every master-side query is `WHERE id = :id AND role = 'CLIENT' AND parentId = :authenticatedMaster`. Another master's client answers `404` on every route, exactly like a client that does not exist, so ids cannot be probed. The same check is repeated inside the allocation / delete transactions against fresh data.
+- A `MASTER` cannot create masters or super admins, cannot reach `/super-admin/*`, and a `SUPER_ADMIN` cannot call `/master/*` (it has no clients of its own).
+- A `SUPER_ADMIN` account can only be modified by a Super Admin: the existing `/admin/users/*` endpoints refuse (`403`) when a plain `ADMIN` tries. Those endpoints can no longer assign `SUPER_ADMIN`, `MASTER` or `CLIENT`, and cannot change the role of a hierarchy account.
+
+### Authentication
+
+The existing endpoints serve all five roles; nothing was replaced.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| POST | `/auth/login` | `{ "email", "password" }` for Super Admin, Master and Client alike |
+| GET | `/auth/me` | the user, including `role`, `parentId` and `master` |
+| POST | `/auth/refresh`, `/auth/logout` | unchanged |
+
+`login` (and `register`) now also return a `master` object, `{ id, name, email }` for a `CLIENT` and `null` for every other role:
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "c1...", "name": "Client One", "email": "client1@example.com", "role": "CLIENT", "isActive": true, "parentId": "m1...", "deletedAt": null, "createdAt": "...", "updatedAt": "..." },
+    "master": { "id": "m1...", "name": "Master One", "email": "master1@example.com" },
+    "tokens": { "accessToken": "...", "refreshToken": "...", "tokenType": "Bearer", "expiresIn": 900 }
+  }
+}
+```
+
+**There are no hardcoded credentials or demo accounts in the backend.** Public registration still creates only `USER` accounts. The first Super Admin is created once, by whoever runs the backend, with credentials from the environment (only a bcrypt hash is stored):
+
+```bash
+# macOS / Linux / Git Bash
+SUPER_ADMIN_EMAIL=owner@example.com SUPER_ADMIN_PASSWORD='ChooseAStr0ngOne' npm run prisma:create-super-admin
+# Windows PowerShell
+$env:SUPER_ADMIN_EMAIL="owner@example.com"; $env:SUPER_ADMIN_PASSWORD="ChooseAStr0ngOne"; npm run prisma:create-super-admin
+```
+
+If that e-mail already belongs to an `ADMIN`, that account is promoted (password kept). A `USER`, `MASTER` or `CLIENT` is never converted. Running it again changes nothing.
+
+### Super Admin API (role `SUPER_ADMIN` only; `403` for everyone else)
+
+All paths are under `/api/v1`. Lists are paginated (`page`, `limit`) and filterable (`search`, `isActive`, `sortBy`, `sortOrder`).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/super-admin/masters` | Create a Master: `{ "name", "email", "password" }` (201) |
+| GET | `/super-admin/masters` | List all Masters, each with `wallet { balance, totalReceived, totalDistributed }` and `clients { total, active }` |
+| GET | `/super-admin/masters/:id` | Master details |
+| PATCH | `/super-admin/masters/:id` | Update `name`, `email`, and/or `password` (reset) |
+| PATCH | `/super-admin/masters/:id/activate` · `/deactivate` | Switch a Master on/off (a deactivated master cannot sign in or receive coins; their clients and balances are kept) |
+| GET | `/super-admin/masters/:id/clients` | A Master's Clients with their coin balances |
+| GET | `/super-admin/masters/:id/wallet` | The Master's coin balance, total received, total distributed, client counts |
+| POST | `/super-admin/masters/:id/allocations` | **Allocate coins to a Master** (see *Coin flow*) |
+| GET | `/super-admin/masters/:id/allocations` | The Master's coin allocation history (`type`, `from`, `to`) |
+| GET | `/super-admin/users` | Every user in the system, any role, with `parentId` and `balance`. Filters: `role`, `parentId`, `isActive`, `search` |
+| GET | `/super-admin/coin-transactions` | System-wide coin transactions. Filters: `type`, `masterId`, `senderId`, `receiverId`, `from`, `to` |
+| GET | `/super-admin/overview` | Users per role and total coins issued / distributed |
+
+```http
+POST /api/v1/super-admin/masters
+Authorization: Bearer <super admin token>
+{ "name": "Master One", "email": "master1@example.com", "password": "Str0ngPassword" }
+```
+
+### Master API (role `MASTER` only; a master only ever sees their own data)
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/master/wallet` | My coin balance, total received from the Super Admin, total distributed, client counts |
+| GET | `/master/coin-transactions` | My coin history: coins received, allocations to my clients, coins returned (`type`, `from`, `to`) |
+| POST | `/master/clients` | Create a Client: `{ "name", "email", "password" }`. `parentId` = me, set automatically. Starts with 0 coins (201) |
+| GET | `/master/clients` | List **my** Clients with their balances |
+| GET | `/master/clients/:id` | One of my Clients |
+| PATCH | `/master/clients/:id` | Update `name`, `email`, and/or `password` (reset) |
+| PATCH | `/master/clients/:id/activate` · `/deactivate` | Switch a Client on/off (a deactivated client cannot sign in or receive coins; the balance is kept) |
+| DELETE | `/master/clients/:id` | **Safe delete** (below) |
+| POST | `/master/clients/:id/allocations` | **Allocate coins to my Client** (see *Coin flow*) |
+| GET | `/master/clients/:id/balance` | The Client's current coin balance |
+| GET | `/master/clients/:id/transactions` | Coin allocations between me and this Client |
+| GET | `/master/clients/:id/wallet-transactions` | The Client's whole wallet ledger (my allocations **and** their game entries and winnings) |
+
+```http
+POST /api/v1/master/clients
+Authorization: Bearer <master token>
+{ "name": "Client One", "email": "client1@example.com", "password": "Str0ngPassword" }
+
+→ 201  { "data": { "id": "c1...", "role": "CLIENT", "parentId": "<my id>", "balance": 0, ... } }
+
+POST /api/v1/master/clients
+{ "name": "Sneaky", "email": "s@example.com", "password": "Str0ngPassword", "parentId": "<another master>" }
+
+→ 400  Validation failed (parentId is not accepted)
+```
+
+**Safe delete.** `DELETE /master/clients/:id` runs one database transaction that (1) moves whatever the client still holds back to the master as a `CLIENT_RECLAIM` transfer, so no coins vanish, (2) deactivates the account and stamps `deletedAt` (soft delete), (3) revokes its sessions. Nothing is physically removed: the wallet, the wallet ledger, the coin transfers and the game history keep pointing at a real row. A deleted client disappears from every list, can never sign in, and cannot be reactivated through any endpoint. Its e-mail stays reserved. Response: `{ "id", "deleted": true, "coinsReturned": 5000 }`.
+
+### Coin flow
+
+```
+Super Admin ──(issues, no limit)──> Master ──(balance-limited)──> Client ──> plays games
+```
+
+Example, exactly as specified:
+
+1. `POST /super-admin/masters/<master1>/allocations` `{ "amount": 20000, "idempotencyKey": "alloc-0001-aaaa" }` → Master 1 has **20,000**.
+2. `POST /master/clients/<client1>/allocations` `{ "amount": 5000, "idempotencyKey": "alloc-0002-aaaa" }` → Client 1 has 5,000; Master 1 has 15,000.
+3. `POST /master/clients/<client2>/allocations` `{ "amount": 3000, "idempotencyKey": "alloc-0003-aaaa" }` → Client 2 has 3,000; Master 1 has **12,000** left.
+4. Asking for more than the master has (`13000`) → `409 You do not have enough coins for this allocation`; nothing changes.
+
+```http
+POST /api/v1/master/clients/<client id>/allocations
+Authorization: Bearer <master token>
+{ "amount": 5000, "idempotencyKey": "alloc-0002-aaaa", "note": "Weekly top-up" }
+
+→ 201
+{
+  "success": true,
+  "message": "Coins allocated successfully",
+  "data": {
+    "transfer": {
+      "id": "...", "type": "CLIENT_ALLOCATION", "amount": 5000,
+      "sender":   { "id": "<master>", "name": "Master One", "email": "...", "role": "MASTER" },
+      "receiver": { "id": "<client>", "name": "Client One", "email": "...", "role": "CLIENT" },
+      "masterId": "<master>", "senderBalanceAfter": 15000, "receiverBalanceAfter": 5000,
+      "senderTransactionId": "<ledger entry>", "receiverTransactionId": "<ledger entry>",
+      "note": "Weekly top-up", "createdAt": "2026-11-30T09:00:00.000Z"
+    },
+    "replayed": false
+  }
+}
+```
+
+Request body (both allocation endpoints): `amount` (0.01 to 1,000,000,000, at most 2 decimals), **`idempotencyKey` (required**, 8-100 characters: letters, digits, `. _ : -`), optional `note` (max 200). There is deliberately no sender, receiver, master or balance field.
+
+**How it is built on the existing ledger** (`demo-wallet/coin-transfers/`, exported by `DemoWalletModule`):
+
+- One transfer is **one database transaction**: lock the wallets involved (always in the same order, so concurrent transfers queue instead of deadlocking) → re-check who may send to whom → debit the sender with the ledger's conditional update (`WHERE balance >= amount`) → credit the receiver → write both `wallet_transactions` rows and the `coin_transfers` row. If any step fails, **all** of it rolls back.
+- **No negative balances / no over-allocation:** the debit is the same conditional update the games use (plus the database `CHECK (balance >= 0)`); a master can never give away more than they hold, even with many simultaneous requests.
+- **Idempotency:** the key is namespaced by sender and receiver and stored uniquely on `coin_transfers` and on both wallet entries. Repeating a request returns the original transfer with `"replayed": true` and posts nothing; reusing a key for a different amount is `409`; two requests racing on the same key can never both post.
+- **Immutable history:** `wallet_transactions` is append-only (existing trigger) and so is `coin_transfers` (new trigger). Each transfer stores sender, receiver, amount, type, both resulting balances, the two ledger-entry ids and the timestamp.
+- The Super Admin **issues** coins: a `MASTER_ALLOCATION` credits the master and has no sender debit (`senderBalanceAfter: null`). Every later movement conserves coins: `master balance + clients' balances` always equals what the master received, minus what clients have since spent in games.
+- **Existing wallet system:** a client's balance is their normal `demo_wallets.balance`. `GET /wallet`, `GET /wallet/balance`, `GET /wallet/transactions` and the game session / round services use it unchanged, so allocated coins are playable immediately. Hierarchy accounts start with an **empty** wallet (no 5,000 starting credits, no ledger line); standalone `USER` wallets are unchanged.
+- The old admin credit/debit endpoints (`/admin/wallets/:userId/credit|debit`) refuse (`403`) master and client wallets for a plain `ADMIN`; only a Super Admin may adjust them by hand, so coins in the hierarchy move through allocations.
+
+| Transfer type | From → To | Wallet ledger types written |
+| --- | --- | --- |
+| `MASTER_ALLOCATION` | Super Admin → Master | `COIN_ALLOCATION_CREDIT` (master) |
+| `CLIENT_ALLOCATION` | Master → Client | `COIN_ALLOCATION_DEBIT` (master), `COIN_ALLOCATION_CREDIT` (client) |
+| `CLIENT_RECLAIM` | Client → Master (client deleted) | `COIN_RECLAIM_DEBIT` (client), `COIN_RECLAIM_CREDIT` (master) |
+
+### Database rules (migrations `20261130090000` and `20261130090100`)
+
+- `users.parentId` (nullable FK to `users.id`, `ON DELETE RESTRICT`) and `users.deletedAt`; `Role` gains `SUPER_ADMIN`, `MASTER`, `CLIENT`; `WalletTransactionType` gains the four `COIN_*` types.
+- **Existing data is untouched.** Every current user keeps `USER` or `ADMIN` with no parent; no wallet, round or ledger row is rewritten. To make an existing `ADMIN` the Super Admin, use the bootstrap script (it promotes, it does not duplicate).
+- `CHECK`: a `CLIENT` always has a parent, nobody else does, nobody is their own parent. Trigger: the parent must be a `MASTER`, and a `MASTER` that still has clients cannot change role.
+- `coin_transfers`: `CHECK (amount > 0)`, non-negative balances, sender ≠ receiver, a shape rule per type; a trigger that validates the roles and the parent link of both sides (`MASTER_ALLOCATION` = SUPER_ADMIN → MASTER, `CLIENT_ALLOCATION` = MASTER → its own CLIENT, `CLIENT_RECLAIM` = CLIENT → its own MASTER); append-only triggers (no `UPDATE`/`DELETE`).
+- The enum values and everything that uses them are in two migrations because PostgreSQL cannot use a new enum value in the transaction that adds it. Requires PostgreSQL 12+.
+
+### Audit
+
+All hierarchy mutations use the existing `@Audit` mechanism (`MASTER_CREATED`, `MASTER_UPDATED`, `MASTER_ACTIVATED`, `MASTER_DEACTIVATED`, `COINS_ALLOCATED_TO_MASTER`, `CLIENT_CREATED`, `CLIENT_UPDATED`, `CLIENT_ACTIVATED`, `CLIENT_DEACTIVATED`, `CLIENT_DELETED`, `COINS_ALLOCATED_TO_CLIENT`), with passwords stripped from the logged body. They are readable by admins at `GET /admin/audit-logs`.
+
+### Known limitations
+
+- Login is by **e-mail** (the existing system); every master and client therefore has an e-mail address. There is no separate username.
+- The e-mail of a deleted client stays reserved (it cannot be reused for a new account).
+- Deactivating a Master does not cascade to their Clients (they keep playing with the coins they hold).
+- Game winnings and losses change a client's wallet through the existing game services; they are not transfers, so they do not appear in `coin_transfers` (they are in the client's wallet ledger, `GET /master/clients/:id/wallet-transactions`).
+- Not covered by the automated tests (they need a real PostgreSQL): the SQL migrations and triggers, and the real transaction/row-lock behaviour. The allocation, ownership and rollback logic is tested with in-memory fakes.
 
 ## Manual setup for Phases 5 and 6
 

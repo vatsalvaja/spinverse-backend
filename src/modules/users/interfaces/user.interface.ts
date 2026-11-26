@@ -9,14 +9,20 @@ export interface CreateUserData {
   /** Already normalised (trimmed, lower-cased). */
   email: string;
   passwordHash: string;
+  /** Defaults to USER. Only the hierarchy service passes MASTER or CLIENT; public registration never does. */
+  role?: Role;
+  /** The owning MASTER for a CLIENT. Always set server-side from the authenticated master, never from a request body. */
+  parentId?: string;
 }
 
-/** Fields that may change after registration. Credentials are never part of it. */
+/** Fields that may change after registration. `passwordHash` is only ever set by the hierarchy service (a master/super admin resetting a managed account). */
 export interface UpdateUserData {
   name?: string;
   email?: string;
   role?: Role;
   isActive?: boolean;
+  passwordHash?: string;
+  deletedAt?: Date;
 }
 
 export interface UserListFilter {
@@ -24,4 +30,6 @@ export interface UserListFilter {
   search?: string;
   role?: Role;
   isActive?: boolean;
+  /** Only the clients of this master. */
+  parentId?: string;
 }

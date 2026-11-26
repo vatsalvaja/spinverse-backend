@@ -1,0 +1,10 @@
+int(37) uniform, 10M draws                     {"chiSquare":34.016,"df":36,"pValue":0.56325,"min":269420,"max":271420,"expected":270270}
+first draw of 4M different seeds, int(37)      {"chiSquare":44.265,"df":36,"pValue":0.16222}
+Neon: orbs per 20-cell grid ~ Binomial(20,.07) {"grids":2000000,"chiSquare":4.0944,"df":7,"pValue":0.76885,"triggerCount":3782,"expectedTriggers":3866.4,"zScore":-1.3586}
+float(): 4M draws                              {"mean":0.49995,"expectedMean":0.5,"variance":0.083368,"expectedVariance":0.083333,"ksStatistic":0.00033698,"ksCritical1pct":0.000815,"chiSquare100bins":79.14,"pValue":0.92928,"lag1Correlation":-0.00016632,"minValue":2.8
+shuffle: where card 0 lands (52 positions)     {"chiSquare":46.635,"df":51,"pValue":0.64753}
+shuffle: which card is on top (52 cards)       {"chiSquare":59.726,"df":51,"pValue":0.18827}
+shuffle: top two cards share a rank (= tie)    {"observed":35219,"expected":35294,"zScore":-0.41215,"observedRate":0.058698,"theoretical":0.058824}
+chance(15000/1e6) and chance(20000/1e6)        {"wildRate":0.014939,"wildZ":-0.99957,"scatterRate":0.019935,"scatterZ":-0.925}
+int(3e9): share below the middle               {"rate":0.50009,"expected":0.5,"zScore":0.26304}
+determinism / commitment / seed uniqueness     {"sameSeedSameStream":true,"differentSeedDifferentStream":true,"commitmentIsSha256OfSeedBytes":true,"seedLengthBits":256,"uniqueSeedsIn100000":100000}

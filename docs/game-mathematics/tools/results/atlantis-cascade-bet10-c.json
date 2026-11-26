@@ -1,0 +1,73 @@
+{
+  "game": "atlantis-cascade",
+  "engineVersion": "1.0.0",
+  "bet": 10,
+  "paidRounds": 1000000,
+  "engineRounds": 1024173,
+  "freeSpinRounds": 24173,
+  "totalStake": 10000000,
+  "totalPayout": 9591003,
+  "rtp": 0.9591003,
+  "rtpStandardError": 0.0026993690098119317,
+  "rtp95Interval": [
+    0.9538095367407686,
+    0.9643910632592314
+  ],
+  "standardDeviationPerPaidRound": 2.6993690098119316,
+  "maxReturnObserved": 415.8,
+  "hitFrequencyIncludingFeature": 0.552152,
+  "baseSpinHitFrequency": 0.55045,
+  "featureTriggerRate": 0.002859,
+  "freeSpinsAwardedTotal": 24173,
+  "returnThresholds": {
+    ">=1e-7": 0.552152,
+    ">=1": 0.279077,
+    ">=2": 0.140757,
+    ">=5": 0.034111,
+    ">=10": 0.009016,
+    ">=25": 0.001643,
+    ">=50": 0.000438,
+    ">=100": 0.000062,
+    ">=250": 0.000001,
+    ">=500": 0,
+    ">=1000": 0
+  },
+  "componentCredits": {
+    "baseSpin": 8818411,
+    "unroundedPayoutFromTotalMultiple": 9591003,
+    "freeSpins": 772592
+  },
+  "componentRtp": {
+    "baseSpin": 0.8818411,
+    "unroundedPayoutFromTotalMultiple": 0.9591003,
+    "freeSpins": 0.0772592
+  },
+  "maxCreditObserved": 3402,
+  "maxCascadesObserved": 10,
+  "extra": {
+    "cascades_0": 449550,
+    "scatters_0": 545491,
+    "scatterSpins_0": 997141,
+    "cascades_1": 395543,
+    "scatters_2": 99113,
+    "scatters_1": 333804,
+    "cascades_3": 28791,
+    "cascades_2": 117652,
+    "scatters_4": 2557,
+    "scatterSpins_8": 2557,
+    "scatters_3": 18733,
+    "cascades_4": 6559,
+    "cascades_5": 1495,
+    "scatters_5": 271,
+    "scatterSpins_12": 271,
+    "cascades_6": 329,
+    "cascades_7": 61,
+    "scatters_6": 31,
+    "scatterSpins_15": 31,
+    "cascades_8": 15,
+    "cascades_9": 3,
+    "cascades_10": 2
+  },
+  "invariantViolations": 0,
+  "violations": []
+}

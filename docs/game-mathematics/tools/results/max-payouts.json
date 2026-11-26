@@ -1,0 +1,36 @@
+{
+  "pharaoh": {
+    "allFifteenPharaohsLineMultiple": 5000,
+    "bestBaseLineMultipleWith3Scarabs": 4000,
+    "bestBaseLineMultipleWith4Scarabs": 3000,
+    "maxTotalMultipleWith3Scarabs": 54005,
+    "maxTotalMultipleWith4Scarabs": 78020,
+    "maxMultipleOfBet": 78020,
+    "maxBet": 500,
+    "maxCredits": 39010000,
+    "note": "Free spins re-use the triggering bet and cannot re-trigger. A free spin that shows 15 Pharaohs pays 5 x 1000 x bet."
+  },
+  "atlantis": {
+    "clusterPayAt15Plus": {
+      "pearl": 120,
+      "trident": 90,
+      "crown": 70,
+      "eye": 50,
+      "amphora": 30,
+      "conch": 24,
+      "crystal": 18,
+      "scale": 12
+    },
+    "bestSingleCascadeMultiple": 210,
+    "perCellPayCeiling": 8,
+    "looseSingleCascadeBound": 240,
+    "maxCascadesPerSpin": 100,
+    "structuralBoundBaseSpinMultiple": 200550,
+    "structuralBoundOneFreeSpinMultiple": 525000,
+    "mostFreeSpinsAwarded": 15,
+    "structuralBoundFeatureMultiple": 8075550,
+    "maxBet": 1000,
+    "freeSpinsTrigger": 4,
+    "note": "There is NO win cap in the code. These are mathematical ceilings (every cascade a perfect 210x board, 100 cascades, multiplier at cap); the real probability of anything near them is effectively zero. The largest payout actually observed is in the simulation result."
+  }
+}

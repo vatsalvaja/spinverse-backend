@@ -1,0 +1,245 @@
+{
+  "game": "skyfall",
+  "roundsPerTarget": 1000000,
+  "stakePerRound": 100,
+  "automatic": {
+    "2": {
+      "label": "auto cash-out 2x",
+      "rounds": 1000000,
+      "rtp": 0.9500679999999606,
+      "standardError": 0.000998753119085886,
+      "ci95": [
+        0.9481104438865523,
+        0.9520255561133689
+      ],
+      "winFrequency": 0.475034,
+      "theoreticalWinFrequency": 0.475,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 200,
+      "violations": []
+    },
+    "3": {
+      "label": "auto cash-out 3x",
+      "rounds": 1000000,
+      "rtp": 0.9502380000000105,
+      "standardError": 0.0013956230476456666,
+      "ci95": [
+        0.9475025788266249,
+        0.952973421173396
+      ],
+      "winFrequency": 0.316746,
+      "theoreticalWinFrequency": 0.31666666666666665,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 300,
+      "violations": []
+    },
+    "5": {
+      "label": "auto cash-out 5x",
+      "rounds": 1000000,
+      "rtp": 0.950939999999978,
+      "standardError": 0.0019622479371417573,
+      "ci95": [
+        0.9470939940431802,
+        0.9547860059567759
+      ],
+      "winFrequency": 0.190188,
+      "theoreticalWinFrequency": 0.19,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 500,
+      "violations": []
+    },
+    "10": {
+      "label": "auto cash-out 10x",
+      "rounds": 1000000,
+      "rtp": 0.9473099999999987,
+      "standardError": 0.0029284317201553793,
+      "ci95": [
+        0.9415702738284941,
+        0.9530497261715033
+      ],
+      "winFrequency": 0.094731,
+      "theoreticalWinFrequency": 0.095,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 1000,
+      "violations": []
+    },
+    "25": {
+      "label": "auto cash-out 25x",
+      "rounds": 1000000,
+      "rtp": 0.9534500000000098,
+      "standardError": 0.004788236212292356,
+      "ci95": [
+        0.9440650570239169,
+        0.9628349429761027
+      ],
+      "winFrequency": 0.038138,
+      "theoreticalWinFrequency": 0.038,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 2500,
+      "violations": []
+    },
+    "100": {
+      "label": "auto cash-out 100x",
+      "rounds": 1000000,
+      "rtp": 0.9624999999999541,
+      "standardError": 0.009763385123700138,
+      "ci95": [
+        0.9433637651575019,
+        0.9816362348424064
+      ],
+      "winFrequency": 0.009625,
+      "theoreticalWinFrequency": 0.0095,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 10000,
+      "violations": []
+    },
+    "500": {
+      "label": "auto cash-out 500x",
+      "rounds": 1000000,
+      "rtp": 0.9315000000000201,
+      "standardError": 0.021561140337022576,
+      "ci95": [
+        0.8892401649394559,
+        0.9737598350605843
+      ],
+      "winFrequency": 0.001863,
+      "theoreticalWinFrequency": 0.0019,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 50000,
+      "violations": []
+    },
+    "1000": {
+      "label": "auto cash-out 1000x",
+      "rounds": 1000000,
+      "rtp": 0.9029999999999895,
+      "standardError": 0.03003640280035996,
+      "ci95": [
+        0.8441286505112839,
+        0.961871349488695
+      ],
+      "winFrequency": 0.000903,
+      "theoreticalWinFrequency": 0.00095,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 100000,
+      "violations": []
+    },
+    "1.01": {
+      "label": "auto cash-out 1.01x",
+      "rounds": 1000000,
+      "rtp": 0.9504271699999998,
+      "standardError": 0.000237948929069842,
+      "ci95": [
+        0.9499607900990229,
+        0.9508935499009767
+      ],
+      "winFrequency": 0.941017,
+      "theoreticalWinFrequency": 0.9405940594059405,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 101,
+      "violations": []
+    },
+    "1.1": {
+      "label": "auto cash-out 1.1x",
+      "rounds": 1000000,
+      "rtp": 0.9504263999999956,
+      "standardError": 0.00037703957397318774,
+      "ci95": [
+        0.949687402435008,
+        0.951165397564983
+      ],
+      "winFrequency": 0.864024,
+      "theoreticalWinFrequency": 0.8636363636363635,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 110,
+      "violations": []
+    },
+    "1.5": {
+      "label": "auto cash-out 1.5x",
+      "rounds": 1000000,
+      "rtp": 0.9505364999999505,
+      "standardError": 0.0007226933197791416,
+      "ci95": [
+        0.9491200210931834,
+        0.9519529789067175
+      ],
+      "winFrequency": 0.633691,
+      "theoreticalWinFrequency": 0.6333333333333333,
+      "theoreticalRtp": 0.95,
+      "maxPayoutObserved": 150,
+      "violations": []
+    }
+  },
+  "manual": {
+    "2": {
+      "label": "manual cash-out at 2x",
+      "rounds": 1000000,
+      "rtp": 0.9464061900000149,
+      "standardError": 0.0009938131762531179,
+      "ci95": [
+        0.9444583161745588,
+        0.948354063825471
+      ],
+      "theoreticalRtp": 0.9452736318407962
+    },
+    "10": {
+      "label": "manual cash-out at 10x",
+      "rounds": 1000000,
+      "rtp": 0.9529660800000425,
+      "standardError": 0.0029346201460436244,
+      "ci95": [
+        0.947214224513797,
+        0.9587179354862879
+      ],
+      "theoreticalRtp": 0.949050949050949
+    },
+    "1.5": {
+      "label": "manual cash-out at 1.5x",
+      "rounds": 1000000,
+      "rtp": 0.9444826899999973,
+      "standardError": 0.000717796748127583,
+      "ci95": [
+        0.9430758083736671,
+        0.9458895716263274
+      ],
+      "theoreticalRtp": 0.9437086092715231
+    }
+  },
+  "crashPointDistribution": {
+    "samples": 11000000,
+    "points": {
+      "P(crash>=1)": {
+        "simulated": 1,
+        "theoretical": 1
+      },
+      "P(crash>=1.01)": {
+        "simulated": 0.9406006363636363,
+        "theoretical": 0.9405940594059405
+      },
+      "P(crash>=1.5)": {
+        "simulated": 0.6333556363636363,
+        "theoretical": 0.6333333333333333
+      },
+      "P(crash>=2)": {
+        "simulated": 0.47502672727272727,
+        "theoretical": 0.475
+      },
+      "P(crash>=5)": {
+        "simulated": 0.1900030909090909,
+        "theoretical": 0.19
+      },
+      "P(crash>=10)": {
+        "simulated": 0.09499972727272728,
+        "theoretical": 0.095
+      },
+      "P(crash>=100)": {
+        "simulated": 0.009503,
+        "theoretical": 0.0095
+      },
+      "P(crash>=1000)": {
+        "simulated": 0.0009487272727272727,
+        "theoretical": 0.00095
+      }
+    }
+  },
+  "seconds": 611.04
+}

@@ -16,9 +16,24 @@ export class AuthTokensDto {
   expiresIn: number;
 }
 
+export class MasterRefDto {
+  @ApiProperty() id: string;
+  @ApiProperty() name: string;
+  @ApiProperty() email: string;
+}
+
+/** `GET /auth/me`: the user plus, for a CLIENT, its owning master. */
+export class MeResponseDto extends UserResponseDto {
+  @ApiProperty({ type: MasterRefDto, nullable: true, description: 'The master that owns this CLIENT account; null for every other role' })
+  master: MasterRefDto | null;
+}
+
 export class AuthResponseDto {
-  @ApiProperty({ type: UserResponseDto })
+  @ApiProperty({ type: UserResponseDto, description: 'Includes `role` and, for a CLIENT, `parentId`' })
   user: UserResponseDto;
+
+  @ApiProperty({ type: MasterRefDto, nullable: true, description: 'The master that owns this CLIENT account; null for every other role' })
+  master: MasterRefDto | null;
 
   @ApiProperty({ type: AuthTokensDto })
   tokens: AuthTokensDto;

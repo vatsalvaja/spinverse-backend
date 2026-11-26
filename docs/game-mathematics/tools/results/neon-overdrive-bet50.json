@@ -1,0 +1,67 @@
+{
+  "game": "neon-overdrive",
+  "engineVersion": "1.0.0",
+  "bet": 50,
+  "paidRounds": 1000000,
+  "engineRounds": 1000000,
+  "freeSpinRounds": 0,
+  "totalStake": 50000000,
+  "totalPayout": 44302910,
+  "rtp": 0.8860582,
+  "rtpStandardError": 0.004298889375950764,
+  "rtp95Interval": [
+    0.8776323768231366,
+    0.8944840231768635
+  ],
+  "standardDeviationPerPaidRound": 4.298889375950764,
+  "maxReturnObserved": 300.8,
+  "hitFrequencyIncludingFeature": 0.429415,
+  "baseSpinHitFrequency": 0.429415,
+  "featureTriggerRate": 0.001804,
+  "freeSpinsAwardedTotal": 0,
+  "returnThresholds": {
+    ">=1e-7": 0.429415,
+    ">=1": 0.243044,
+    ">=2": 0.135682,
+    ">=5": 0.027109,
+    ">=10": 0.007104,
+    ">=25": 0.00276,
+    ">=50": 0.001487,
+    ">=100": 0.000529,
+    ">=250": 0.000004,
+    ">=500": 0,
+    ">=1000": 0
+  },
+  "componentCredits": {
+    "baseLines": 36861510,
+    "holdAndRespinBonus": 7441400
+  },
+  "componentRtp": {
+    "baseLines": 0.7372302,
+    "holdAndRespinBonus": 0.148828
+  },
+  "maxCreditObserved": 15040,
+  "maxCascadesObserved": 0,
+  "extra": {
+    "paidSpinsWithLineWin": 427966,
+    "finalCores_7": 71,
+    "finalCores_11": 147,
+    "overdrive": 1479,
+    "finalCores_18": 77,
+    "finalCores_17": 154,
+    "finalCores_19": 46,
+    "finalCores_14": 191,
+    "finalCores_13": 195,
+    "finalCores_15": 202,
+    "finalCores_16": 164,
+    "finalCores_9": 121,
+    "finalCores_12": 163,
+    "finalCores_10": 129,
+    "finalCores_6": 70,
+    "finalCores_8": 63,
+    "finalCores_20": 11,
+    "fullGrid": 11
+  },
+  "invariantViolations": 0,
+  "violations": []
+}

@@ -1,0 +1,89 @@
+{
+  "game": "atlantis-cascade",
+  "bet": 10,
+  "paidSpins": 500000,
+  "exact": {
+    "scatterCountDistribution": [
+      0.5454843193824369,
+      0.3339699914586348,
+      0.09882785461531031,
+      0.01882435326005911,
+      0.002593150704191816,
+      0.00027519150330198867,
+      0.000023400638035883387,
+      0.000001637362428166768,
+      9.606973430570323e-8
+    ],
+    "probabilityOfFreeSpinTrigger": 0.0028934812835583333,
+    "oneInSpins": 345.6044473770448,
+    "expectedFreeSpinsAwardedPerPaidSpin": 0.024424589814126315,
+    "exactlyFourScatters": 0.002593150704191816,
+    "exactlyFiveScatters": 0.00027519150330198867,
+    "sixOrMoreScatters": 0.000025139076064527918
+  },
+  "measured": {
+    "baseGameRtp": 0.8815206,
+    "freeSpinsRtpContribution": 0.0851834,
+    "spinsWithAtLeastOneCluster": 0.551056,
+    "cascadesInSpin": {
+      "0": 0.448944,
+      "1": 0.394904,
+      "2": 0.11871,
+      "3": 0.028958,
+      "4": 0.006624,
+      "5": 0.00151,
+      "6": 0.000276,
+      "7": 0.000054,
+      "8": 0.000016,
+      "9": 0.000004
+    },
+    "rtpContributionBySymbol": {
+      "crystal": 0.1357242,
+      "amphora": 0.1443936,
+      "conch": 0.143198,
+      "scale": 0.1075794,
+      "trident": 0.076392,
+      "crown": 0.086303,
+      "eye": 0.1196324,
+      "pearl": 0.068298
+    },
+    "rtpContributionByClusterSize": {
+      "5-6": {
+        "clustersPerPaidSpin": 0.667932,
+        "rtp": 0.4464758
+      },
+      "9-11": {
+        "clustersPerPaidSpin": 0.048908,
+        "rtp": 0.149849
+      },
+      "7-8": {
+        "clustersPerPaidSpin": 0.160694,
+        "rtp": 0.2217838
+      },
+      "12-14": {
+        "clustersPerPaidSpin": 0.006356,
+        "rtp": 0.048636
+      },
+      "15+": {
+        "clustersPerPaidSpin": 0.000738,
+        "rtp": 0.014776
+      }
+    },
+    "firstBoardSymbolShare": {
+      "crystal": 0.16285773333333334,
+      "pearl": 0.06510066666666667,
+      "conch": 0.15162773333333332,
+      "amphora": 0.1409462,
+      "scale": 0.173409,
+      "trident": 0.07611666666666667,
+      "crown": 0.08677073333333334,
+      "eye": 0.10842473333333333,
+      "wild": 0.014699733333333333,
+      "scatter": 0.0200468
+    },
+    "chanceTwoHorizontalNeighboursMatch": 0.23806172064642078,
+    "chanceTwoNeighboursMatchIfIndependent": 0.1343490215881833,
+    "averageClustersPerPaidSpin": 0.884628,
+    "freeSpinsPlayed": 12210
+  }
+}

@@ -49,6 +49,12 @@ class FakeWallets {
   wallet: DemoWallet | null = null;
   created = 0;
   createError: unknown = null;
+  /** Role reported for any user id (the admin adjustment guard looks it up). */
+  userRole: string | null = 'USER';
+
+  async findUserRole() {
+    return this.userRole;
+  }
 
   async findByUserId() {
     return this.wallet;
@@ -90,6 +96,8 @@ const admin: SafeUser = {
   email: 'admin@example.com',
   role: Role.ADMIN,
   isActive: true,
+  parentId: null,
+  deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -242,6 +250,32 @@ describe('AdminWalletService', () => {
     await service.credit(admin, 'player-1', dto({ type: 'BONUS_CREDIT' }));
     await service.debit(admin, 'player-1', Object.assign(new DebitWalletDto(), { amount: 5, reason: 'Fix a mistake' }));
     assert.deepEqual(ledger.posted.map((p) => p.type), ['BONUS_CREDIT', 'ADMIN_DEBIT']);
+  });
+
+  it('keeps master and client wallets out of reach of a plain ADMIN (coins move through allocations); a SUPER_ADMIN may adjust', async () => {
+    const wallets = new FakeWallets();
+    wallets.wallet = makeWallet({ userId: 'client-1' });
+    const localLedger = new FakeLedger();
+    const local = new AdminWalletService(
+      wallets as unknown as DemoWalletRepository,
+      localLedger as unknown as WalletLedgerRepository,
+      new DemoWalletService(wallets as unknown as DemoWalletRepository, localLedger as unknown as WalletLedgerRepository),
+    );
+    const superAdmin = { ...admin, id: 'super-1', role: Role.SUPER_ADMIN };
+
+    for (const role of ['MASTER', 'CLIENT']) {
+      wallets.userRole = role;
+      await assert.rejects(local.credit(admin, 'client-1', dto()), ForbiddenException);
+      await assert.rejects(local.debit(admin, 'client-1', dto()), ForbiddenException);
+    }
+    assert.equal(localLedger.posted.length, 0);
+
+    await local.credit(superAdmin, 'client-1', dto());
+    assert.equal(localLedger.posted.length, 1);
+
+    wallets.userRole = 'USER'; // ordinary players are unaffected for a plain admin
+    await local.credit(admin, 'client-1', dto());
+    assert.equal(localLedger.posted.length, 2);
   });
 
   it('forbids administrators from adjusting their own wallet', async () => {

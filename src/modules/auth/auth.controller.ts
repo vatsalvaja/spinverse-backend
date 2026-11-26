@@ -10,17 +10,16 @@ import {
 import { ApiSuccessResponse } from '../../common/decorators/api-success-response.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiErrorResponseDto, ApiResponseDto } from '../../common/dto/api-response.dto';
-import { UserResponseDto } from '../users/dto/user-response.dto';
 import type { SafeUser } from '../users/interfaces/user.interface';
 import { AuthService } from './auth.service';
 import { AUTH_API_TAG, AUTH_MESSAGES, AUTH_ROUTE } from './constants/auth.constants';
 import { Auth } from './decorators/auth.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { AuthResponseDto, AuthTokensDto } from './dto/auth-response.dto';
+import { AuthResponseDto, AuthTokensDto, MeResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
-import { AuthSession, AuthTokens } from './interfaces/auth-session.interface';
+import { AuthProfile, AuthSession, AuthTokens } from './interfaces/auth-session.interface';
 
 @ApiTags(AUTH_API_TAG)
 @Controller(AUTH_ROUTE)
@@ -85,8 +84,8 @@ export class AuthController {
   @Auth()
   @ResponseMessage(AUTH_MESSAGES.PROFILE_FETCHED)
   @ApiOperation({ summary: 'Get the currently authenticated user' })
-  @ApiSuccessResponse(UserResponseDto, 'Current user')
-  me(@CurrentUser() user: SafeUser): SafeUser {
-    return user;
+  @ApiSuccessResponse(MeResponseDto, 'Current user, with the owning master for a CLIENT')
+  me(@CurrentUser() user: SafeUser): Promise<AuthProfile> {
+    return this.authService.getProfile(user);
   }
 }

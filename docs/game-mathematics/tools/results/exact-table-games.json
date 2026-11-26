@@ -1,0 +1,354 @@
+{
+  "roulette": {
+    "pockets": 37,
+    "positions": 154,
+    "wheelIsPermutationOf0to36": true,
+    "redCount": 18,
+    "expectedRtp": 0.972972972972973,
+    "worstDeviationFrom36over37": 1.1102230246251565e-16,
+    "byType": {
+      "straight": {
+        "positions": 37,
+        "numbersCovered": 1,
+        "probability": 0.02702702702702703,
+        "rtp": 0.9729729729729729,
+        "netPayout": 35
+      },
+      "split": {
+        "positions": 60,
+        "numbersCovered": 2,
+        "probability": 0.05405405405405406,
+        "rtp": 0.9729729729729729,
+        "netPayout": 17
+      },
+      "street": {
+        "positions": 12,
+        "numbersCovered": 3,
+        "probability": 0.08108108108108109,
+        "rtp": 0.9729729729729729,
+        "netPayout": 11
+      },
+      "corner": {
+        "positions": 22,
+        "numbersCovered": 4,
+        "probability": 0.10810810810810811,
+        "rtp": 0.9729729729729729,
+        "netPayout": 8
+      },
+      "sixline": {
+        "positions": 11,
+        "numbersCovered": 6,
+        "probability": 0.16216216216216217,
+        "rtp": 0.9729729729729729,
+        "netPayout": 5
+      },
+      "dozen": {
+        "positions": 3,
+        "numbersCovered": 12,
+        "probability": 0.32432432432432434,
+        "rtp": 0.9729729729729729,
+        "netPayout": 2
+      },
+      "column": {
+        "positions": 3,
+        "numbersCovered": 12,
+        "probability": 0.32432432432432434,
+        "rtp": 0.9729729729729729,
+        "netPayout": 2
+      },
+      "red": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      },
+      "black": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      },
+      "odd": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      },
+      "even": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      },
+      "low": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      },
+      "high": {
+        "positions": 1,
+        "numbersCovered": 18,
+        "probability": 0.4864864864864865,
+        "rtp": 0.9729729729729729,
+        "netPayout": 1
+      }
+    },
+    "tableLimit": {
+      "perPosition": 10000,
+      "maxEntries": 500
+    },
+    "maxSingleBetReturn": {
+      "straight": 360000
+    },
+    "allPositionsAtLimit": {
+      "positionsStaked": 154,
+      "totalStake": 1540000,
+      "maxReturn": 1800000,
+      "atWinningNumber": 32,
+      "meanReturn": 1498378.3783783785,
+      "rtp": 0.972972972972973,
+      "maxNetWin": 260000
+    }
+  },
+  "tiger": {
+    "orderedCardPairs": 2652,
+    "probability": {
+      "tiger": 0.47058823529411764,
+      "dragon": 0.47058823529411764,
+      "tie": 0.058823529411764705
+    },
+    "expectedRtp": {
+      "tiger": 0.9705882352941176,
+      "dragon": 0.9705882352941176,
+      "tie": 0.5294117647058824
+    },
+    "houseEdge": {
+      "tiger": 0.02941176470588236,
+      "dragon": 0.02941176470588236,
+      "tie": 0.47058823529411764
+    },
+    "closedForm": {
+      "pTie": 0.058823529411764705,
+      "tiger": 0.9705882352941176,
+      "dragon": 0.9705882352941176,
+      "tie": 0.5294117647058824
+    },
+    "payoutTable": {
+      "win": 2,
+      "tie": 9,
+      "tieSurrender": 0.5
+    },
+    "breakEvenTieProbability": 0.1111111111111111,
+    "maxPayout": {
+      "tieBetAtMaxStake": 90000,
+      "sideBetAtMaxStake": 20000
+    },
+    "payoutForCheck": {
+      "tigerWin": 200,
+      "tigerOnTie": 50,
+      "tieOnTie": 900,
+      "tieOnWin": 0
+    }
+  },
+  "skyfall": {
+    "houseEdgeSetting": 0.05,
+    "maxCrashMultiplier": 1000,
+    "probabilityInstantCrashAt1x_continuous": 0.05,
+    "probabilityCrashPointEqualsExactly1_00": 0.05940594059405942,
+    "medianCrashPoint": 1.9,
+    "probabilityOfMaxCrash": 0.00095,
+    "autoCashoutRows": [
+      {
+        "target": 1.01,
+        "probabilityOfPaying": 0.9405940594059405,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 0.23874672772626632
+      },
+      {
+        "target": 1.1,
+        "probabilityOfPaying": 0.8636363636363635,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 0.37749172176353746
+      },
+      {
+        "target": 1.5,
+        "probabilityOfPaying": 0.6333333333333333,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 0.7228416147400479
+      },
+      {
+        "target": 2,
+        "probabilityOfPaying": 0.475,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 0.998749217771909
+      },
+      {
+        "target": 3,
+        "probabilityOfPaying": 0.31666666666666665,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 1.3955285736952863
+      },
+      {
+        "target": 5,
+        "probabilityOfPaying": 0.19,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 1.9615045245933032
+      },
+      {
+        "target": 10,
+        "probabilityOfPaying": 0.095,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 2.93214938227915
+      },
+      {
+        "target": 25,
+        "probabilityOfPaying": 0.038,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 4.7799058568135
+      },
+      {
+        "target": 100,
+        "probabilityOfPaying": 0.0095,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 9.700386590234432
+      },
+      {
+        "target": 500,
+        "probabilityOfPaying": 0.0019,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 21.773780103601673
+      },
+      {
+        "target": 1000,
+        "probabilityOfPaying": 0.00095,
+        "rtp": 0.95,
+        "standardDeviationOfReturn": 30.807426052820446
+      }
+    ],
+    "manualCashoutRows": [
+      {
+        "displayedMultiple": 1.01,
+        "rtp": 0.9406862745098039,
+        "vsAuto": -0.009313725490196045
+      },
+      {
+        "displayedMultiple": 1.5,
+        "rtp": 0.9437086092715231,
+        "vsAuto": -0.006291390728476842
+      },
+      {
+        "displayedMultiple": 2,
+        "rtp": 0.9452736318407962,
+        "vsAuto": -0.004726368159203798
+      },
+      {
+        "displayedMultiple": 5,
+        "rtp": 0.9481037924151696,
+        "vsAuto": -0.001896207584830334
+      },
+      {
+        "displayedMultiple": 10,
+        "rtp": 0.949050949050949,
+        "vsAuto": -0.0009490509490509558
+      },
+      {
+        "displayedMultiple": 100,
+        "rtp": 0.94990500949905,
+        "vsAuto": -0.0000949905009499652
+      }
+    ],
+    "boundaryChecks": [
+      {
+        "target": 1.01,
+        "thresholdU": 0.05940594059405946,
+        "crashJustBelow": 1,
+        "crashJustAbove": 1.01,
+        "ok": true
+      },
+      {
+        "target": 1.1,
+        "thresholdU": 0.13636363636363646,
+        "crashJustBelow": 1.09,
+        "crashJustAbove": 1.1,
+        "ok": true
+      },
+      {
+        "target": 1.5,
+        "thresholdU": 0.3666666666666667,
+        "crashJustBelow": 1.49,
+        "crashJustAbove": 1.5,
+        "ok": true
+      },
+      {
+        "target": 2,
+        "thresholdU": 0.525,
+        "crashJustBelow": 1.99,
+        "crashJustAbove": 2,
+        "ok": true
+      },
+      {
+        "target": 3,
+        "thresholdU": 0.6833333333333333,
+        "crashJustBelow": 2.99,
+        "crashJustAbove": 3,
+        "ok": true
+      },
+      {
+        "target": 5,
+        "thresholdU": 0.81,
+        "crashJustBelow": 4.99,
+        "crashJustAbove": 5,
+        "ok": true
+      },
+      {
+        "target": 10,
+        "thresholdU": 0.905,
+        "crashJustBelow": 9.99,
+        "crashJustAbove": 10,
+        "ok": true
+      },
+      {
+        "target": 25,
+        "thresholdU": 0.962,
+        "crashJustBelow": 24.99,
+        "crashJustAbove": 25,
+        "ok": true
+      },
+      {
+        "target": 100,
+        "thresholdU": 0.9905,
+        "crashJustBelow": 99.99,
+        "crashJustAbove": 100,
+        "ok": true
+      },
+      {
+        "target": 500,
+        "thresholdU": 0.9981,
+        "crashJustBelow": 499.99,
+        "crashJustAbove": 500,
+        "ok": true
+      },
+      {
+        "target": 1000,
+        "thresholdU": 0.99905,
+        "crashJustBelow": 999.99,
+        "crashJustAbove": 1000,
+        "ok": true
+      }
+    ],
+    "boundaryErrors": 0,
+    "drawJustBelowInstantThreshold": 1,
+    "drawAtUnitIntervalTop": 1000,
+    "maxPayout": {
+      "perPanel": 10000000,
+      "twoPanels": 20000000
+    },
+    "maxPayoutProbabilityPerPanel": 0.00095
+  }
+}

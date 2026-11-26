@@ -1,0 +1,35 @@
+{
+ "game": "tiger-clash",
+ "decksPlayed": 100000,
+ "rounds": 2600000,
+ "note": "Card counting from the visible cards of finished rounds only (the deck itself is never sent to the player).",
+ "flatStake100_bestSideEachRound": {
+  "label": "flat 100, tie when 9*p(tie) > 1 else tiger",
+  "rounds": 2600000,
+  "rtp": 1.00291,
+  "standardError": 0.000719503,
+  "ci95": [
+   1.0015,
+   1.00432
+  ]
+ },
+ "roundsWithPositiveTieExpectation": 66785,
+ "fractionOfRoundsWithEdge": 0.0256865,
+ "maximumConditionalTieProbabilitySeen": 1,
+ "roundsWhereTheTieWasCertain": 5800,
+ "betSpreading": {
+  "bigStake": 10000,
+  "smallStake": 1,
+  "description": "stake 10000 on Tie when the counted tie probability exceeds 1/9, otherwise stake 1 on Tiger",
+  "profitPerDeckInUnitsOfBigStake": 0.763981,
+  "profitPerDeckStandardError": 0.00988186,
+  "profitPerDeckCredits": 7639.81,
+  "profitPerDeckCreditsCi95": [
+   7446.13,
+   7833.5
+  ],
+  "overallReturnOnStake": 2.13962,
+  "totalStakedInBigUnits": 67038.3
+ },
+ "seconds": 29.383
+}

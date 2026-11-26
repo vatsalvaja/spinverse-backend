@@ -1,0 +1,12 @@
+{
+  "neonOverdrive": {
+    "perLineExpected": {
+      "asCoded": 0.061331010021875264,
+      "payTheBetterOfTheTwo": 0.06133122341875025
+    },
+    "rtpContributionOfTheRuleAcrossAllLines": 0.000002560762499798086,
+    "probabilityPerLineThatTheRuleCostsThePlayer": 7.753125e-8,
+    "probabilityPerSpinThatAtLeastOneLineIsAffectedApprox": 9.303746030253635e-7,
+    "averageShortfallWhenAffected": 2.7523982265215645
+  }
+}

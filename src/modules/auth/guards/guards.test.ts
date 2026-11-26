@@ -34,6 +34,8 @@ const makeUser = (overrides: Partial<SafeUser> = {}): SafeUser => ({
   email: 'jane@example.com',
   role: Role.USER,
   isActive: true,
+  parentId: null,
+  deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   ...overrides,
@@ -127,5 +129,40 @@ describe('RolesGuard', () => {
   it('forbids a user without the required role (403)', () => {
     const context = contextFor({ user: makeUser({ role: Role.USER }) }, adminOnly());
     assert.throws(() => guard.canActivate(context), ForbiddenException);
+  });
+
+  describe('hierarchy roles', () => {
+    const only = (...roles: Role[]) => {
+      const handler = function restricted() {};
+      Roles(...roles)({}, 'restricted', { value: handler } as TypedPropertyDescriptor<() => void>);
+      return handler;
+    };
+    const can = (role: Role, handler: () => void) => {
+      try {
+        return guard.canActivate(contextFor({ user: makeUser({ role }) }, handler));
+      } catch (error) {
+        assert.ok(error instanceof ForbiddenException);
+        return false;
+      }
+    };
+
+    it('SUPER_ADMIN routes accept only a SUPER_ADMIN (not ADMIN, MASTER, CLIENT or USER)', () => {
+      const handler = only(Role.SUPER_ADMIN);
+      assert.equal(can(Role.SUPER_ADMIN, handler), true);
+      for (const role of [Role.ADMIN, Role.MASTER, Role.CLIENT, Role.USER]) assert.equal(can(role, handler), false, role);
+    });
+
+    it('MASTER routes accept only a MASTER (not even a SUPER_ADMIN or a CLIENT)', () => {
+      const handler = only(Role.MASTER);
+      assert.equal(can(Role.MASTER, handler), true);
+      for (const role of [Role.SUPER_ADMIN, Role.ADMIN, Role.CLIENT, Role.USER]) assert.equal(can(role, handler), false, role);
+    });
+
+    it('a SUPER_ADMIN also satisfies the existing ADMIN routes, while MASTER and CLIENT do not', () => {
+      const handler = only(Role.ADMIN);
+      assert.equal(can(Role.ADMIN, handler), true);
+      assert.equal(can(Role.SUPER_ADMIN, handler), true);
+      for (const role of [Role.MASTER, Role.CLIENT, Role.USER]) assert.equal(can(role, handler), false, role);
+    });
   });
 });

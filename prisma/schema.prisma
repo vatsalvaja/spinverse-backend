@@ -19,9 +19,15 @@ datasource db {
 // Phase 2 - Authentication & Authorization
 // -----------------------------------------------------------------------------
 
+/// USER and ADMIN are the original roles and keep working unchanged (standalone players and platform admins).
+/// SUPER_ADMIN, MASTER and CLIENT form the management hierarchy:
+///   SUPER_ADMIN creates MASTERs, a MASTER creates CLIENTs (every CLIENT has exactly one parent MASTER).
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
+  MASTER
+  CLIENT
 }
 
 model User {
@@ -31,8 +37,21 @@ model User {
   passwordHash String // bcrypt hash - the plain-text password is never stored
   role         Role     @default(USER)
   isActive     Boolean  @default(true)
+  /// Hierarchy: set only for CLIENT accounts, always the MASTER that owns them. NULL for every other role.
+  /// A CHECK constraint and triggers (see the hierarchy migration) enforce that rule in the database itself.
+  parentId     String?
+  /// Soft delete. A deleted account keeps its row (ledger and history reference it) but can never sign in
+  /// and no longer appears in any list.
+  deletedAt    DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  parent   User?  @relation("MasterClients", fields: [parentId], references: [id], onDelete: Restrict)
+  children User[] @relation("MasterClients")
+
+  coinTransfersSent     CoinTransfer[] @relation("CoinTransferSender")
+  coinTransfersReceived CoinTransfer[] @relation("CoinTransferReceiver")
+  coinTransfersAsMaster CoinTransfer[] @relation("CoinTransferMaster")
 
   refreshTokens RefreshToken[]
   demoWallet    DemoWallet?
@@ -40,6 +59,8 @@ model User {
   auditLogs          AuditLog[]
   gameSessions  GameSession[]
 
+  @@index([parentId])
+  @@index([role, isActive])
   @@map("users")
 }
 
@@ -345,6 +366,11 @@ enum WalletTransactionType {
   GAME_WINNING_CREDIT
   GAME_REFUND
   BONUS_CREDIT
+  /// Hierarchy coin transfers (see CoinTransfer): a receiver is credited, a sender is debited.
+  COIN_ALLOCATION_CREDIT
+  COIN_ALLOCATION_DEBIT
+  COIN_RECLAIM_CREDIT
+  COIN_RECLAIM_DEBIT
 }
 
 enum WalletTransactionDirection {
@@ -377,6 +403,9 @@ model WalletTransaction {
 
   wallet DemoWallet @relation(fields: [walletId], references: [id], onDelete: Restrict)
   user   User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  coinTransferAsSender   CoinTransfer? @relation("CoinTransferSenderTx")
+  coinTransferAsReceiver CoinTransfer? @relation("CoinTransferReceiverTx")
 
   @@index([walletId, createdAt])
   @@index([userId, createdAt])
@@ -415,4 +444,51 @@ model AuditLog {
   @@index([resourceType, resourceId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// -----------------------------------------------------------------------------
+// Phase 10 - Super Admin / Master / Client coin hierarchy
+// -----------------------------------------------------------------------------
+
+enum CoinTransferType {
+  MASTER_ALLOCATION // SUPER_ADMIN -> MASTER (the super admin issues coins, so there is no sender wallet)
+  CLIENT_ALLOCATION // MASTER -> CLIENT
+  CLIENT_RECLAIM // CLIENT -> MASTER (the remaining balance of a client that is being deleted)
+}
+
+/// One coin movement in the hierarchy. Append-only (a database trigger rejects updates and deletes).
+/// The money itself lives in the existing wallet ledger: each transfer points at the wallet_transactions rows
+/// it created (the receiver's credit and, except for MASTER_ALLOCATION, the sender's debit), and all of them are
+/// written in one database transaction.
+model CoinTransfer {
+  id                    String           @id @default(uuid())
+  type                  CoinTransferType
+  /// The account that gave the coins (the super admin for MASTER_ALLOCATION).
+  senderId              String
+  receiverId            String
+  /// The master this movement belongs to: the receiver of a MASTER_ALLOCATION, otherwise the master on either side.
+  masterId              String
+  amount                Decimal          @db.Decimal(14, 2)
+  /// Null for MASTER_ALLOCATION: the super admin issues coins and has no balance to reduce.
+  senderBalanceAfter    Decimal?         @db.Decimal(14, 2)
+  receiverBalanceAfter  Decimal          @db.Decimal(14, 2)
+  senderTransactionId   String?          @unique
+  receiverTransactionId String           @unique
+  /// Globally unique. Repeating a request with the same key returns the original transfer instead of posting again.
+  idempotencyKey        String           @unique
+  note                  String?
+  createdAt             DateTime         @default(now())
+
+  sender              User              @relation("CoinTransferSender", fields: [senderId], references: [id], onDelete: Restrict)
+  receiver            User              @relation("CoinTransferReceiver", fields: [receiverId], references: [id], onDelete: Restrict)
+  master              User              @relation("CoinTransferMaster", fields: [masterId], references: [id], onDelete: Restrict)
+  senderTransaction   WalletTransaction? @relation("CoinTransferSenderTx", fields: [senderTransactionId], references: [id], onDelete: Restrict)
+  receiverTransaction WalletTransaction  @relation("CoinTransferReceiverTx", fields: [receiverTransactionId], references: [id], onDelete: Restrict)
+
+  @@index([masterId, createdAt])
+  @@index([senderId, createdAt])
+  @@index([receiverId, createdAt])
+  @@index([type, createdAt])
+  @@index([createdAt])
+  @@map("coin_transfers")
 }
